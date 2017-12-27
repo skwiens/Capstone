@@ -28,7 +28,7 @@ Solution: An app that can automate some of the repetative work.  It would send o
   
  __Technology selections__:
     - Front-end: jQuery, Javascript, Bootstrap, (CSS, HTML)
-    - Back-end: Python, Flask, Gmail API
+    - Back-end: Python, Flask, Gmail API, DB: MySQL
     - Deployment: AWS
   
  __Wireframes__:
