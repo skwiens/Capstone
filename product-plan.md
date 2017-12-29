@@ -24,7 +24,7 @@ Solution: An app that can automate some of the repetative work.  It would send o
  __User Personas__: (A summary of your main target user group(s). What are their key characteristics? How do those characteristics factor into project/app/idea?) The user group focuses on two leaders and a team of around 25 volunteers.  Their key necessary characteristics are busy schedules and a desire to do more to help in their community.  These key characteristics factor into the app because it is necessary that the app both reduces the amount of time they need to spend on the tasks that are less interesting to them so they can focus on serving in the ways they love as well as it needs to be inuitive and easy to use. This app will not be a success if it requires too much work on the part of the user or is confusing to use. 
 
  __Trello Board__:
-    - Flesh out the feature set that you created in the conceptual delivery to get started with your Trello board
+    - https://trello.com/b/Kr3uftmw/food-bank-capstone-app
   
  __Technology selections__:
     - Front-end: jQuery, Javascript, Bootstrap, (CSS, HTML)
