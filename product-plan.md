@@ -32,6 +32,6 @@ Solution: An app that can automate some of the repetative work.  It would send o
     - Deployment: AWS
   
  __Wireframes__:
-    - https://photos.app.goo.gl/YWrNjlreVNRkBspr1
+    - https://photos.app.goo.gl/lJhIVcIYLIiqAXoi2
 
 
