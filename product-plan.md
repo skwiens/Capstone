@@ -32,6 +32,6 @@ Solution: An app that can automate some of the repetative work.  It would send o
     - Deployment: AWS
   
  __Wireframes__:
-    - Any format you may like - photos of paper, online tool and/or paper to show your instructors
+    - https://photos.app.goo.gl/YWrNjlreVNRkBspr1
 
 
