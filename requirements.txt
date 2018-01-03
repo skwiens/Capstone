@@ -1,0 +1,7 @@
+# TODO: Make a list of all the packages that need to be installed. To install them someone can run pip install -r requirements.txt
+
+To get the list, run pip freeze at the end of the project
+
+OR
+
+To create this file run pip freeze > requirements.txt
