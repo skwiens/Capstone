@@ -11,6 +11,6 @@ class ProdConfig(Config):
     pass
 
 class DevConfig(Config):
-    DEBUG=True
-    SQLALCHEMY_DATABASE_URI = 'mysql://lola:lilly@localhost/food_bank'
-    SECRET_KEY = 'clavesecreto'
+DEBUG=True
+SQLALCHEMY_DATABASE_URI = 'mysql://lola:lilly@localhost/food_bank'
+SECRET_KEY = 'clavesecreto'
