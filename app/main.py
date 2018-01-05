@@ -23,7 +23,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    records = db.relationship('Record', backref='user', lazy='dynamic')
+    # records = db.relationship('Record', backref='user', lazy='dynamic')
 
     def __init__(self, name, username, email, password):
         self.name = name
@@ -36,7 +36,8 @@ class User(db.Model):
 
 class Record(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    author = db.Column(db.Integer(), db.ForeignKey('user.id'))
+    # author = db.Column(db.Integer(), db.ForeignKey('user.id'))
+    author = db.Column(db.String(255))
     date = db.Column(db.DateTime(), unique=True)
     volunteers = db.Column(db.String(255))
     notes = db.Column(db.Text())
