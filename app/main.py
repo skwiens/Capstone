@@ -6,11 +6,14 @@ from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from wtforms.validators import InputRequired, Email, Length
 from passlib.hash import sha256_crypt
 from functools import wraps
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
+
 app.config.from_object(DevConfig)
 app.config.from_object(DevConfig)
 db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
 
 class User(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -65,7 +68,7 @@ def register():
             name = form.name.data,
             username = form.username.data,
             email = form.email.data,
-            password = sha256_crypt.encrypt(str(form.password.data))
+            password = bcrypt.generate_password_hash(str(form.password.data))
         )
 
         db.session.add(new_user)
@@ -85,9 +88,7 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user:
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            print(user)
-            if sha256_crypt.verify(password_candidate, user.password):
+            if bcrypt.check_password_hash(user.password, password_candidate):
                 session['logged_in'] = True
                 session['username'] = username
 
