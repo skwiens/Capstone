@@ -3,6 +3,7 @@ from config import DevConfig
 from flask_sqlalchemy import SQLAlchemy
 # from flask_wtf import FlaskForm
 from wtforms import Form, StringField, TextAreaField, PasswordField, SelectField, validators
+# from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import InputRequired, Email, Length
 from wtforms.fields.html5 import DateField
 from passlib.hash import sha256_crypt
@@ -22,7 +23,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    # records = db.relationship('Record', backref='user', lazy='dynamic')
+    records = db.relationship('Record', backref='user', lazy='dynamic')
 
     def __init__(self, name, username, email, password):
         self.name = name
@@ -35,7 +36,7 @@ class User(db.Model):
 
 class Record(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    author = db.Column(db.String(255))
+    author = db.Column(db.Integer(), db.ForeignKey('user.id'))
     date = db.Column(db.DateTime(), unique=True)
     volunteers = db.Column(db.String(255))
     notes = db.Column(db.Text())
@@ -148,10 +149,13 @@ def edit_user(username):
 
             return redirect(url_for('index'))
         else:
-            print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
             return render_template('edit_user.html', form=form)
 
+def volunteer_query():
+    return User.query
+
 class RecordForm(Form):
+    # author = QuerySelectField(query_factory=volunteer_query, allow_blank=True, get_label='name')
     author = StringField('Name')
     date = DateField('Date', format='%Y-%m-%d')
     volunteers = StringField('Volunteers')
@@ -179,11 +183,6 @@ def add_record():
         return redirect(url_for('index'))
 
     return render_template('add_record.html', form=form)
-
-
-
-
-
 
 if __name__ == '__main__':
     app.run()
