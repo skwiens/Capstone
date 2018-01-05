@@ -22,14 +22,14 @@ bcrypt = Bcrypt(app)
 class Volunteer(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(100))
-    position = db.Column(db.String(50))
+    role = db.Column(db.String(50))
     email = db.Column(db.String(255), unique=True, nullable=False)
     # records = db.relationship('Record', backref='volunteer', lazy='dynamic')
 
-    def __init__(self, name, email, position):
+    def __init__(self, name, email, role):
         self.name = name
         self.email = email
-        self.position = position
+        self.role = role
 
     def __repr__(self):
         return "<Volunteer '{}'>".format(self.name)
@@ -63,24 +63,24 @@ class VolunteerForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
     email = StringField('Email', [validators.DataRequired(), validators.Email(), validators.Length(min=6, max=50)])
     # role = StringField('Role')
-    position = SelectField('Role', choices = [('open-hours', 'open-hours'), ('shopper','shoppers'), ('both', 'both')] )
+    role = SelectField('Role', choices = [('open-hours', 'open-hours'), ('shopper','shoppers'), ('both', 'both')] )
 
 @app.route('/add_volunteer', methods=['GET', 'POST'])
 def add_volunteer():
     form = VolunteerForm(request.form)
     if request.method == 'POST' and form.validate():
-        print(form.position.data)
+        print(form.role.data)
 
         new_volunteer = Volunteer(
             name = form.name.data,
             email = form.email.data,
-            position = form.position.data
+            role = form.role.data
         )
 
         db.session.add(new_volunteer)
         db.session.commit()
 
-        flash('Volunteer ' + new_volunteer.position + ' added!', 'success')
+        flash('Volunteer ' + new_volunteer.role + ' added!', 'success')
 
         return redirect(url_for('index'))
     return render_template('volunteer_form.html', form=form)
