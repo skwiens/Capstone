@@ -11,12 +11,12 @@
       <th>Customers</th>
     </tr>
     {% for record in records %}
-      <tr><a href="record/{{record.id}}">
-        <td>{{ record.date.strftime('%m/%d/%Y') }}</td>
+      <tr>
+        <td><a href="record/{{record.id}}">{{ record.date.strftime('%m/%d/%Y') }}</a></td>
         <td>{{ record.author }}</td>
         <td>{{ record.volunteers }}</td>
         <td>{{ record.customers }}</td>
-      </a></tr>
+      </tr>
     {% endfor %}
 
   </table>

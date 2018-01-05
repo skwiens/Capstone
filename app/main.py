@@ -154,8 +154,15 @@ def edit_user(username):
         else:
             return render_template('edit_user.html', form=form)
 
-def volunteer_query():
-    return User.query
+# def volunteer_query():
+#     return User.query
+
+@app.route('/record/<string:id>')
+def record(id):
+    record = Record.query.get(id)
+
+    return render_template('record.html', record=record)
+
 
 class RecordForm(Form):
     # author = QuerySelectField(query_factory=volunteer_query, allow_blank=True, get_label='name')
