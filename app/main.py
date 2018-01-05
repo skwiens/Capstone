@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, url_for, redirect, session, f
 from config import DevConfig
 from flask_sqlalchemy import SQLAlchemy
 # from flask_wtf import FlaskForm
-from wtforms import Form, StringField, TextAreaField, PasswordField, SelectField, validators
+from wtforms import Form, StringField, TextAreaField, PasswordField, IntegerField, validators
 # from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import InputRequired, Email, Length
 from wtforms.fields.html5 import DateField
@@ -38,15 +38,17 @@ class Record(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     # author = db.Column(db.Integer(), db.ForeignKey('user.id'))
     author = db.Column(db.String(255))
-    date = db.Column(db.DateTime(), unique=True)
+    date = db.Column(db.DateTime())
     volunteers = db.Column(db.String(255))
+    customers = db.Column(db.Integer())
     notes = db.Column(db.Text())
     shopping = db.Column(db.Text())
 
-    def __init__(self, author, date, volunteers, notes, shopping):
+    def __init__(self, author, date, volunteers, customers, notes, shopping):
         self.author = author
         self.date = date
         self.volunteers = volunteers
+        self.customers = customers
         self.notes = notes
         self.shopping = shopping
 
@@ -127,7 +129,7 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/user/edit/<string:username>', methods=['GET', 'POST'])
-@is_logged_in
+# @is_logged_in
 def edit_user(username):
     if username != session['username']:
         flash('You are not authorized to change this information', 'danger')
@@ -160,11 +162,12 @@ class RecordForm(Form):
     author = StringField('Name')
     date = DateField('Date', format='%Y-%m-%d')
     volunteers = StringField('Volunteers')
+    customers = IntegerField('Number of Customers')
     notes = TextAreaField('Notes')
     shopping = TextAreaField('Shopping List')
 
 @app.route('/add_record', methods=['GET', 'POST'])
-@is_logged_in
+# @is_logged_in
 def add_record():
     form = RecordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -172,6 +175,7 @@ def add_record():
             author = form.author.data,
             date = form.date.data,
             volunteers = form.volunteers.data,
+            customers = form.customers.data,
             notes = form.notes.data,
             shopping = form.shopping.data
         )
@@ -184,6 +188,17 @@ def add_record():
         return redirect(url_for('index'))
 
     return render_template('add_record.html', form=form)
+
+@app.route('/records')
+def records():
+    records = Record.query.all()
+
+    if records:
+        return render_template('records.html', records=records)
+    else:
+        msg = 'No Records Found'
+        return render_template('records.html', msg=msg)
+
 
 if __name__ == '__main__':
     app.run()
