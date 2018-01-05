@@ -2,8 +2,9 @@ from flask import Flask, render_template, request, url_for, redirect, session, f
 from config import DevConfig
 from flask_sqlalchemy import SQLAlchemy
 # from flask_wtf import FlaskForm
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from wtforms import Form, StringField, TextAreaField, PasswordField, SelectField, validators
 from wtforms.validators import InputRequired, Email, Length
+from wtforms.fields.html5 import DateField
 from passlib.hash import sha256_crypt
 from functools import wraps
 from flask_bcrypt import Bcrypt
@@ -21,7 +22,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    records = db.relationship('Record', backref='user', lazy='dynamic')
+    # records = db.relationship('Record', backref='user', lazy='dynamic')
 
     def __init__(self, name, username, email, password):
         self.name = name
@@ -34,14 +35,18 @@ class User(db.Model):
 
 class Record(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
+    author = db.Column(db.String(255))
     date = db.Column(db.DateTime(), unique=True)
     volunteers = db.Column(db.String(255))
     notes = db.Column(db.Text())
-    shopping_list = db.Column(db.Text())
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
+    shopping = db.Column(db.Text())
 
-    def __init__(self, date):
+    def __init__(self, author, date, volunteers, notes, shopping):
+        self.author = author
         self.date = date
+        self.volunteers = volunteers
+        self.notes = notes
+        self.shopping = shopping
 
     def __repr__(self):
         return "<Record '{}'>".format(self.title)
@@ -119,7 +124,7 @@ def logout():
     flash('You are now logged out', 'success')
     return redirect(url_for('index'))
 
-@app.route('/edit_user/<string:username>', methods=['GET', 'POST'])
+@app.route('/user/edit/<string:username>', methods=['GET', 'POST'])
 @is_logged_in
 def edit_user(username):
     if username != session['username']:
@@ -145,6 +150,39 @@ def edit_user(username):
         else:
             print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
             return render_template('edit_user.html', form=form)
+
+class RecordForm(Form):
+    author = StringField('Name')
+    date = DateField('Date', format='%Y-%m-%d')
+    volunteers = StringField('Volunteers')
+    notes = TextAreaField('Notes')
+    shopping = TextAreaField('Shopping List')
+
+@app.route('/add_record', methods=['GET', 'POST'])
+@is_logged_in
+def add_record():
+    form = RecordForm(request.form)
+    if request.method == 'POST' and form.validate():
+        new_record = Record(
+            author = form.author.data,
+            date = form.date.data,
+            volunteers = form.volunteers.data,
+            notes = form.notes.data,
+            shopping = form.shopping.data
+        )
+
+        db.session.add(new_record)
+        db.session.commit()
+
+        flash('Record for ' + new_record.date.strftime('%m/%d/%Y') + 'saved! Thank you for volunteering with us!', 'success')
+
+        return redirect(url_for('index'))
+
+    return render_template('add_record.html', form=form)
+
+
+
+
 
 
 if __name__ == '__main__':
