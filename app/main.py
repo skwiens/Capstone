@@ -2,13 +2,15 @@ from flask import Flask, render_template, request, url_for, redirect, session, f
 from config import DevConfig
 from flask_sqlalchemy import SQLAlchemy
 # from flask_wtf import FlaskForm
-from wtforms import Form, StringField, TextAreaField, PasswordField, IntegerField, validators
+from wtforms import Form, StringField, TextAreaField, IntegerField, SelectField, validators
 # from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import InputRequired, Email, Length
 from wtforms.fields.html5 import DateField
+from wtforms_sqlalchemy.fields import QuerySelectField
 from passlib.hash import sha256_crypt
 from functools import wraps
 from flask_bcrypt import Bcrypt
+
 
 app = Flask(__name__)
 
@@ -17,26 +19,24 @@ app.config.from_object(DevConfig)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-class User(db.Model):
+class Volunteer(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(100))
-    username = db.Column(db.String(50), unique=True)
+    position = db.Column(db.String(50))
     email = db.Column(db.String(255), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    # records = db.relationship('Record', backref='user', lazy='dynamic')
+    # records = db.relationship('Record', backref='volunteer', lazy='dynamic')
 
-    def __init__(self, name, username, email, password):
+    def __init__(self, name, email, position):
         self.name = name
-        self.username = username
-        self. email = email
-        self.password = password
+        self.email = email
+        self.position = position
 
     def __repr__(self):
-        return "<User '{}'>".format(self.username)
+        return "<Volunteer '{}'>".format(self.name)
 
 class Record(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    # author = db.Column(db.Integer(), db.ForeignKey('user.id'))
+    # author = db.Column(db.Integer(), db.ForeignKey('volunteer.id'))
     author = db.Column(db.String(255))
     date = db.Column(db.DateTime())
     volunteers = db.Column(db.String(255))
@@ -59,34 +59,31 @@ class Record(db.Model):
 def index():
     return render_template('index.html')
 
-class RegisterForm(Form):
+class VolunteerForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
-    username = StringField('Username', [validators.Length(min=4, max=25)])
     email = StringField('Email', [validators.DataRequired(), validators.Email(), validators.Length(min=6, max=50)])
-    password = PasswordField('Password', [
-        validators.DataRequired(),
-        validators.EqualTo('confirm', message='Passwords do not match')
-    ])
-    confirm = PasswordField('Confirm Password')
+    # role = StringField('Role')
+    position = SelectField('Role', choices = [('open-hours', 'open-hours'), ('shopper','shoppers'), ('both', 'both')] )
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegisterForm(request.form)
+@app.route('/add_volunteer', methods=['GET', 'POST'])
+def add_volunteer():
+    form = VolunteerForm(request.form)
     if request.method == 'POST' and form.validate():
-        new_user = User(
+        print(form.position.data)
+
+        new_volunteer = Volunteer(
             name = form.name.data,
-            username = form.username.data,
             email = form.email.data,
-            password = bcrypt.generate_password_hash(str(form.password.data))
+            position = form.position.data
         )
 
-        db.session.add(new_user)
+        db.session.add(new_volunteer)
         db.session.commit()
 
-        flash('You are now registered and can log in', 'success')
+        flash('Volunteer ' + new_volunteer.position + ' added!', 'success')
 
         return redirect(url_for('index'))
-    return render_template('register.html', form=form)
+    return render_template('volunteer_form.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -128,34 +125,29 @@ def logout():
     flash('You are now logged out', 'success')
     return redirect(url_for('index'))
 
-@app.route('/user/edit/<string:username>', methods=['GET', 'POST'])
-# @is_logged_in
-def edit_user(username):
-    if username != session['username']:
-        flash('You are not authorized to change this information', 'danger')
-    else:
-        user = User.query.filter_by(username=username).first()
-        form = RegisterForm(request.form)
+# @app.route('/volunteer/edit/<string:id>', methods=['GET', 'POST'])
+# # @is_logged_in
+# def edit_volunteer(id):
+#
+#     volunteer = Volunteer.query.get(id)
+#     form = VolunteerForm(request.form)
+#
+#     form.name.data = volunteer.name
+#     form.email.data = volunteer.email
+#     form.role.data = volunteer.role
+#
+#     if request.method == 'POST' and form.validate():
+#         volunteer.name = form.name.data,
+#         volunteer.email = form.volunteer.data,
+#
+#         db.session.commit()
+#
+#         flash('Information from ' + volunteer.name + ' Updated', 'success')
+#
+#         return redirect(url_for('index'))
+#     else:
+#         return render_template('edit_volunteer.html', form=form)
 
-        form.username.data = user.username
-        form.email.data = user.email
-
-        if request.method == 'POST' and form.validate():
-            user.name = form.name.data,
-            user.username = form.username.data,
-            user.email = form.email.data,
-            user.password = bcrypt.generate_password_hash(str(form.password.data))
-
-            db.session.commit()
-
-            flash('User Information Updated', 'success')
-
-            return redirect(url_for('index'))
-        else:
-            return render_template('edit_user.html', form=form)
-
-# def volunteer_query():
-#     return User.query
 
 @app.route('/record/<string:id>')
 def record(id):
@@ -164,9 +156,13 @@ def record(id):
     return render_template('record.html', record=record)
 
 
+def volunteer_query():
+    return Volunteer.query
+
 class RecordForm(Form):
     # author = QuerySelectField(query_factory=volunteer_query, allow_blank=True, get_label='name')
     author = StringField('Name')
+    # author = QuerySelectField(query_factory=volunteer_query, allow_blank=True)
     date = DateField('Date', format='%Y-%m-%d')
     volunteers = StringField('Volunteers')
     customers = IntegerField('Number of Customers')

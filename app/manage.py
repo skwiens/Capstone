@@ -1,7 +1,7 @@
 from flask_script import Manager, Server
 from flask_migrate import Migrate, MigrateCommand
 
-from main import app, db, User, Record
+from main import app, db, Volunteer, Record
 
 migrate = Migrate(app, db)
 
@@ -14,7 +14,7 @@ manager.add_command('db', MigrateCommand)
 
 @manager.shell
 def make_shell_conext():
-    return dict(app=app, db=db, User=User, Record=Record)
+    return dict(app=app, db=db, Volunteer=Volunteer, Record=Record)
 
 if __name__ == "__main__":
     manager.run()
