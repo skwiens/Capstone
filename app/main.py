@@ -103,11 +103,49 @@ def login():
 
     return render_template('login.html')
 
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Please log in to see this page', 'danger')
+            return redirect(url_for('login'))
+    return wrap
+
 @app.route('/logout')
 def logout():
     session.clear()
     flash('You are now logged out', 'success')
     return redirect(url_for('index'))
+
+@app.route('/edit_user/<string:username>', methods=['GET', 'POST'])
+@is_logged_in
+def edit_user(username):
+    if username != session['username']:
+        flash('You are not authorized to change this information', 'danger')
+    else:
+        user = User.query.filter_by(username=username).first()
+        form = RegisterForm(request.form)
+
+        form.username.data = user.username
+        form.email.data = user.email
+
+        if request.method == 'POST' and form.validate():
+            user.name = form.name.data,
+            user.username = form.username.data,
+            user.email = form.email.data,
+            user.password = bcrypt.generate_password_hash(str(form.password.data))
+
+            db.session.commit()
+
+            flash('User Information Updated', 'success')
+
+            return redirect(url_for('index'))
+        else:
+            print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+            return render_template('edit_user.html', form=form)
+
 
 if __name__ == '__main__':
     app.run()
