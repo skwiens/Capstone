@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, url_for, redirect, session, f
 from . import app
 from .forms import VolunteerForm, RecordForm
 from .models import Record, Volunteer
+from app import db
 
 @app.route('/')
 def index():
@@ -27,69 +28,78 @@ def add_volunteer():
         return redirect(url_for('index'))
     return render_template('volunteer_form.html', form=form)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password_candidate = request.form['password']
+@app.route('/volunteer/edit/<string:id>', methods=['GET', 'POST'])
+def edit_volunteer(id):
 
-        user = User.query.filter_by(username=username).first()
+    volunteer = Volunteer.query.get(id)
+    form = VolunteerForm(request.form)
 
-        if user:
-            if bcrypt.check_password_hash(user.password, password_candidate):
-                session['logged_in'] = True
-                session['username'] = username
+    form.name.data = volunteer.name
+    form.email.data = volunteer.email
+    form.role.data = volunteer.role
 
-                flash('Your are now logged in', 'success')
-                return redirect(url_for('index'))
-            else:
-                error = 'Invalid login'
-                return render_template('login.html', error=error)
-        else:
-            error='Username not found'
-            return render_template('login.html', error=error)
+    if request.method == 'POST' and form.validate():
+        volunteer.name = form.name.data,
+        volunteer.email = form.email.data,
 
-    return render_template('login.html')
+        db.session.commit()
 
-def is_logged_in(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return f(*args, **kwargs)
-        else:
-            flash('Please log in to see this page', 'danger')
-            return redirect(url_for('login'))
-    return wrap
+        flash('Information from ' + volunteer.name + ' Updated', 'success')
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash('You are now logged out', 'success')
-    return redirect(url_for('index'))
+        return redirect(url_for('index'))
+    else:
+        return render_template('volunteer_form.html', form=form)
 
-# @app.route('/volunteer/edit/<string:id>', methods=['GET', 'POST'])
-# # @is_logged_in
-# def edit_volunteer(id):
+@app.route('/volunteers')
+def volunteers():
+    volunteers = Volunteer.query.all()
+
+    if volunteers:
+        return render_template('volunteers.html', volunteers=volunteers)
+    else:
+        msg = 'No Records Found'
+        return render_template('volunteers.html', msg=msg)
+
+
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     if request.method == 'POST':
+#         username = request.form['username']
+#         password_candidate = request.form['password']
 #
-#     volunteer = Volunteer.query.get(id)
-#     form = VolunteerForm(request.form)
+#         user = User.query.filter_by(username=username).first()
 #
-#     form.name.data = volunteer.name
-#     form.email.data = volunteer.email
-#     form.role.data = volunteer.role
+#         if user:
+#             if bcrypt.check_password_hash(user.password, password_candidate):
+#                 session['logged_in'] = True
+#                 session['username'] = username
 #
-#     if request.method == 'POST' and form.validate():
-#         volunteer.name = form.name.data,
-#         volunteer.email = form.volunteer.data,
+#                 flash('Your are now logged in', 'success')
+#                 return redirect(url_for('index'))
+#             else:
+#                 error = 'Invalid login'
+#                 return render_template('login.html', error=error)
+#         else:
+#             error='Username not found'
+#             return render_template('login.html', error=error)
 #
-#         db.session.commit()
-#
-#         flash('Information from ' + volunteer.name + ' Updated', 'success')
-#
-#         return redirect(url_for('index'))
-#     else:
-#         return render_template('edit_volunteer.html', form=form)
+#     return render_template('login.html')
 
+# def is_logged_in(f):
+#     @wraps(f)
+#     def wrap(*args, **kwargs):
+#         if 'logged_in' in session:
+#             return f(*args, **kwargs)
+#         else:
+#             flash('Please log in to see this page', 'danger')
+#             return redirect(url_for('login'))
+#     return wrap
+
+# @app.route('/logout')
+# def logout():
+#     session.clear()
+#     flash('You are now logged out', 'success')
+#     return redirect(url_for('index'))
 
 @app.route('/record/<string:id>')
 def record(id):
@@ -98,7 +108,6 @@ def record(id):
     return render_template('record.html', record=record)
 
 @app.route('/add_record', methods=['GET', 'POST'])
-# @is_logged_in
 def add_record():
     form = RecordForm(request.form)
     if request.method == 'POST' and form.validate():

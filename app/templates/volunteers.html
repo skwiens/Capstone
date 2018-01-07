@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>Volunteers</h1>
+  <hr>
+  <table class="table table-striped">
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Active</th>
+      <th></th>
+      <th></th>
+    </tr>
+    {% for volunteer in volunteers %}
+      <tr>
+        <td>{{ volunteer.name }}</td>
+        <td>{{ volunteer.email }}</td>
+        <td>{{ volunteer.role }}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+    {% endfor %}
+
+  </table>
+
+{% endblock %}

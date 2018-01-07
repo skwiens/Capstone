@@ -13,7 +13,6 @@ class VolunteerForm(Form):
     role = StringField('Role')
     role = SelectField('Role', choices = [('open-hours', 'open-hours'), ('shopper','shoppers'), ('both', 'both')] )
 
-
 class RecordForm(Form):
     # author = QuerySelectField(query_factory=volunteer_query, allow_blank=True, get_label='name')
     author = StringField('Name')
