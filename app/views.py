@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect, session, flash
 from . import app
 from .forms import VolunteerForm, RecordForm
+from .models import Record, Volunteer
 
 @app.route('/')
 def index():

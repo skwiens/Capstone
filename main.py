@@ -1,5 +1,5 @@
 # from flask import Flask, render_template, request, url_for, redirect, session, flash
-# from config import DevConfig
+# # from config import DevConfig
 # from flask_sqlalchemy import SQLAlchemy
 # # from flask_wtf import FlaskForm
 # from wtforms import Form, StringField, TextAreaField, IntegerField, SelectField, validators
@@ -14,8 +14,7 @@
 #
 # app = Flask(__name__)
 #
-# app.config.from_object(DevConfig)
-# app.config.from_object(DevConfig)
+# app.config.from_object('config')
 # db = SQLAlchemy(app)
 # bcrypt = Bcrypt(app)
 #
