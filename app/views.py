@@ -32,15 +32,17 @@ def add_volunteer():
 def edit_volunteer(id):
 
     volunteer = Volunteer.query.get(id)
-    form = VolunteerForm(request.form)
+    form = VolunteerForm(request.form, obj=volunteer)
 
-    form.name.data = volunteer.name
-    form.email.data = volunteer.email
-    form.role.data = volunteer.role
+    # form.name.data = volunteer.name
+    # form.email.data = volunteer.email
+    # form.role.data = volunteer.role
 
     if request.method == 'POST' and form.validate():
-        volunteer.name = form.name.data,
-        volunteer.email = form.email.data,
+        form.populate_obj(volunteer)
+
+        print('!!!!!!!!!!!!!!!!!!!!!!!')
+        print(volunteer.name)
 
         db.session.commit()
 
