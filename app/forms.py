@@ -22,3 +22,7 @@ class RecordForm(Form):
     customers = IntegerField('Number of Customers')
     notes = TextAreaField('Notes')
     shopping = TextAreaField('Shopping List')
+
+class UserForm(Form):
+    username = StringField('Username', [validators.Length(min=1, max=50)])
+    password = StringField('Password', [validators.DataRequired()])

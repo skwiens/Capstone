@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect, session, flash
 from . import app
-from .forms import VolunteerForm, RecordForm
-from .models import Record, Volunteer
+from .forms import VolunteerForm, RecordForm, UserForm
+from .models import Record, Volunteer, User
 from app import db
 
 @app.route('/')
@@ -12,7 +12,6 @@ def index():
 def add_volunteer():
     form = VolunteerForm(request.form)
     if request.method == 'POST' and form.validate():
-        print(form.role.data)
 
         new_volunteer = Volunteer(
             name = form.name.data,
@@ -23,7 +22,7 @@ def add_volunteer():
         db.session.add(new_volunteer)
         db.session.commit()
 
-        flash('Volunteer ' + new_volunteer.role + ' added!', 'success')
+        flash('Volunteer ' + new_volunteer.name + ' added!', 'success')
 
         return redirect(url_for('index'))
     return render_template('volunteer_form.html', form=form)
@@ -34,15 +33,8 @@ def edit_volunteer(id):
     volunteer = Volunteer.query.get(id)
     form = VolunteerForm(request.form, obj=volunteer)
 
-    # form.name.data = volunteer.name
-    # form.email.data = volunteer.email
-    # form.role.data = volunteer.role
-
     if request.method == 'POST' and form.validate():
         form.populate_obj(volunteer)
-
-        print('!!!!!!!!!!!!!!!!!!!!!!!')
-        print(volunteer.name)
 
         db.session.commit()
 
@@ -62,6 +54,44 @@ def volunteers():
         msg = 'No Records Found'
         return render_template('volunteers.html', msg=msg)
 
+@app.route('/edit_user', methods=['GET', 'POST'])
+def edit_user():
+
+    user = User.query.get(1)
+    form = UserForm(request.form, obj=user)
+
+    if request.method == 'POST' and form.validate():
+        form.populate_obj(user)
+
+        db.session.commit()
+
+        flash('User login updated')
+
+        return redirect(url_for('index'))
+    else:
+        return render_template('user.html', form=form)
+
+@app.route('/add_user', methods=['GET', 'POST'])
+def new_user():
+
+    form = UserForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+        new_user = User(
+            username = form.username.data,
+            password = form.password.data
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        db.session.commit()
+
+        flash('User login updated')
+
+        return redirect(url_for('index'))
+    else:
+        return render_template('user.html', form=form)
 
 # @app.route('/login', methods=['GET', 'POST'])
 # def login():
