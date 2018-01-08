@@ -93,29 +93,31 @@ def new_user():
     else:
         return render_template('user.html', form=form)
 
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'POST':
-#         username = request.form['username']
-#         password_candidate = request.form['password']
-#
-#         user = User.query.filter_by(username=username).first()
-#
-#         if user:
-#             if bcrypt.check_password_hash(user.password, password_candidate):
-#                 session['logged_in'] = True
-#                 session['username'] = username
-#
-#                 flash('Your are now logged in', 'success')
-#                 return redirect(url_for('index'))
-#             else:
-#                 error = 'Invalid login'
-#                 return render_template('login.html', error=error)
-#         else:
-#             error='Username not found'
-#             return render_template('login.html', error=error)
-#
-#     return render_template('login.html')
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password_candidate = request.form['password']
+
+        user = User.query.filter_by(username=username).first()
+
+        if user:
+            if password_candidate == user.password:
+                session['logged_in'] = True
+                session['username'] = username
+                session['role'] = 'User'
+
+                flash('Your are now logged in as a volunteer', 'success')
+                return redirect(url_for('index'))
+            else:
+                print('no matchy matchy')
+                error = 'Invalid login'
+                return render_template('login.html', error=error)
+        else:
+            return render_template('login.html')
+            error='Username not found'
+            return render_template('login.html', error=error)
+    return render_template('login.html')
 
 # def is_logged_in(f):
 #     @wraps(f)
@@ -127,11 +129,11 @@ def new_user():
 #             return redirect(url_for('login'))
 #     return wrap
 
-# @app.route('/logout')
-# def logout():
-#     session.clear()
-#     flash('You are now logged out', 'success')
-#     return redirect(url_for('index'))
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You are now logged out', 'success')
+    return redirect(url_for('index'))
 
 @app.route('/record/<string:id>')
 def record(id):
