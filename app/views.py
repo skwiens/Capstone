@@ -3,10 +3,12 @@ from . import app
 from .forms import VolunteerForm, RecordForm, UserForm
 from .models import Record, Volunteer, User
 from app import db
+from functools import wraps
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/add_volunteer', methods=['GET', 'POST'])
 def add_volunteer():
@@ -27,6 +29,7 @@ def add_volunteer():
         return redirect(url_for('index'))
     return render_template('volunteer_form.html', form=form)
 
+
 @app.route('/volunteer/edit/<string:id>', methods=['GET', 'POST'])
 def edit_volunteer(id):
 
@@ -44,6 +47,7 @@ def edit_volunteer(id):
     else:
         return render_template('volunteer_form.html', form=form)
 
+
 @app.route('/volunteers')
 def volunteers():
     volunteers = Volunteer.query.all()
@@ -53,6 +57,7 @@ def volunteers():
     else:
         msg = 'No Records Found'
         return render_template('volunteers.html', msg=msg)
+
 
 @app.route('/edit_user', methods=['GET', 'POST'])
 def edit_user():
@@ -70,6 +75,7 @@ def edit_user():
         return redirect(url_for('index'))
     else:
         return render_template('user.html', form=form)
+
 
 @app.route('/add_user', methods=['GET', 'POST'])
 def new_user():
@@ -103,14 +109,13 @@ def login():
 
         if user:
             if password_candidate == user.password:
-                session['logged_in'] = True
+                session['logged_in_user'] = True
                 session['username'] = username
-                session['role'] = 'User'
+                # session['user'] = True
 
                 flash('Your are now logged in as a volunteer', 'success')
                 return redirect(url_for('index'))
             else:
-                print('no matchy matchy')
                 error = 'Invalid login'
                 return render_template('login.html', error=error)
         else:
@@ -129,11 +134,23 @@ def login():
 #             return redirect(url_for('login'))
 #     return wrap
 
+def user_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in_user' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Please log in to see this page', 'danger')
+            return redirect(url_for('login'))
+    return wrap
+
+
 @app.route('/logout')
 def logout():
     session.clear()
     flash('You are now logged out', 'success')
     return redirect(url_for('index'))
+
 
 @app.route('/record/<string:id>')
 def record(id):
@@ -141,7 +158,9 @@ def record(id):
 
     return render_template('record.html', record=record)
 
+
 @app.route('/add_record', methods=['GET', 'POST'])
+@user_logged_in
 def add_record():
     form = RecordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -162,6 +181,7 @@ def add_record():
         return redirect(url_for('index'))
 
     return render_template('add_record.html', form=form)
+
 
 @app.route('/records')
 def records():
