@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect, session, flash
 from . import app
-from .forms import VolunteerForm, RecordForm, UserForm
-from .models import Record, Volunteer, User
+from .forms import VolunteerForm, RecordForm, UserForm, EmailForm
+from .models import Record, Volunteer, User, Email
 from app import db
 from functools import wraps
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
@@ -362,150 +362,84 @@ def index():
 #             flash('Please log in to see this page', 'danger')
 #             return redirect(url_for('login'))
 #     return wrap
-#
-#
-# @app.route('/logout')
-# def logout():
-#     session.clear()
-#     flash('You are now logged out', 'success')
-#     return redirect(url_for('index'))
-#
-#
-# @app.route('/record/<string:id>')
-# def record(id):
-#     record = Record.query.get(id)
-#
-#     return render_template('record.html', record=record)
-#
-#
-# @app.route('/add_record', methods=['GET', 'POST'])
-# @user_logged_in
-# def add_record():
-#     form = RecordForm(request.form)
-#     if request.method == 'POST' and form.validate():
-#         new_record = Record(
-#             author = form.author.data,
-#             date = form.date.data,
-#             volunteers = form.volunteers.data,
-#             customers = form.customers.data,
-#             notes = form.notes.data,
-#             shopping = form.shopping.data
-#         )
-#
-#         db.session.add(new_record)
-#         db.session.commit()
-#
-#         flash('Record for ' + new_record.date.strftime('%m/%d/%Y') + 'saved! Thank you for volunteering with us!', 'success')
-#
-#         return redirect(url_for('index'))
-#
-#     return render_template('add_record.html', form=form)
-#
-#
-# @app.route('/records')
-# def records():
-#     records = Record.query.all()
-#
-#     if records:
-#         return render_template('records.html', records=records)
-#     else:
-#         msg = 'No Records Found'
-#         return render_template('records.html', msg=msg)
+
+def user_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in_user' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Please log in to see this page', 'danger')
+            return redirect(url_for('login'))
+    return wrap
 
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You are now logged out', 'success')
+    return redirect(url_for('index'))
 
 
+@app.route('/record/<string:id>')
+def record(id):
+    record = Record.query.get(id)
+
+    return render_template('record.html', record=record)
 
 
+@app.route('/add_record', methods=['GET', 'POST'])
+@user_logged_in
+def add_record():
+    form = RecordForm(request.form)
+    if request.method == 'POST' and form.validate():
+        new_record = Record(
+            author = form.author.data,
+            date = form.date.data,
+            volunteers = form.volunteers.data,
+            customers = form.customers.data,
+            notes = form.notes.data,
+            shopping = form.shopping.data
+        )
+
+        db.session.add(new_record)
+        db.session.commit()
+
+        flash('Record for ' + new_record.date.strftime('%m/%d/%Y') + 'saved! Thank you for volunteering with us!', 'success')
+
+        return redirect(url_for('index'))
+
+    return render_template('add_record.html', form=form)
 
 
+@app.route('/records')
+def records():
+    records = Record.query.all()
 
+    if records:
+        return render_template('records.html', records=records)
+    else:
+        msg = 'No Records Found'
+        return render_template('records.html', msg=msg)
 
+@app.route('/add_email', methods=['GET', 'POST'])
+def add_email():
+    form = EmailForm(request.form)
+    if request.method == 'POST' and form.validate():
+        new_email = Email(
+            send_date = form.send_date.data,
+            recipients = form.recipients.data,
+            subject = form.subject.data,
+            message = form.message.data
+        )
 
+        db.session.add(new_email)
+        db.session.commit()
 
+        flash('Email created but not sent', 'success')
 
+        return redirect(url_for('index'))
 
-
-
-
-
-
-
-
-
-# @app.route('/login')
-# def login():
-#     if current_user.is_authenticated:
-#         return redirect(url_for('index'))
-#     google = get_google_auth()
-#     auth_url, state = google.authorization_url(
-#         Auth.AUTH_URI, access_type='offline')
-#     session['oauth_state'] = state
-#     return render_template('user_login.html', auth_url=auth_url)
-#
-#
-# # Helper Functions for oauth2
-# def get_google_auth(state=None, token=None):
-#     if token:
-#         return OAuth2Session(Auth.CLIENT_ID, token=token)
-#     if state:
-#         return OAuth2Session(
-#             Auth.CLIENT_ID,
-#             state=state,
-#             redirect_uri=Auth.REDIRECT_URI
-#         )
-#     oauth = OAuth2Session(
-#         Auth.CLIENT_ID,
-#         redirect_uri=Auth.REDIRECT_URI,
-#         scope=Auth.SCOPE
-#     )
-#     return oauth
-#
-# @app.route('/oauth2callback')
-# def callback():
-#     # Redirect user to home page if already logged in.
-#     if current_user is not None and current_user.is_authenticated:
-#         return redirect(url_for('index'))
-#     # In case user denies access
-#     if 'error' in request.args:
-#         if request.args.get('error') == 'access_denied':
-#             return 'You denied access.'
-#         return 'Error encountered.'
-#     # If they tried to reach this location by typing in address instead of through google, go back to login
-#     if 'code' not in request.args and 'state' not in request.args:
-#         return redirect(url_for('login'))
-#     else:
-#         # Execution reaches here when user has
-#         # successfully authenticated our app.
-#         google = get_google_auth(state=session['oauth_state'])
-#         try:
-#             #try to get an access token from Google
-#             token = google.fetch_token(
-#                 Auth.TOKEN_URI,
-#                 client_secret=Auth.CLIENT_SECRET,
-#                 authorization_response=request.url)
-#         # in case of errors
-#         except HTTPError:
-#             return 'HTTPError occurred.'
-#         #access user information using the token
-#         google = get_google_auth(token=token)
-#         resp = google.get(Auth.USER_INFO)
-#         if resp.status_code == 200:
-#             user_data = resp.json()
-#             email = user_data['email']
-#             user = User.query.filter_by(email=email).first()
-#             if user is None:
-#                 user = User()
-#                 user.email = email
-#             user.name = user_data['name']
-#             print(token)
-#             user.tokens = json.dumps(token)
-#             user.avatar = user_data['picture']
-#             db.session.add(user)
-#             db.session.commit()
-#             login_user(user)
-#             return redirect(url_for('index'))
-#         return 'Could not fetch your information.'
-
+    return render_template('new_email.html', form=form)
 if __name__ == '__main__':
     app.run()

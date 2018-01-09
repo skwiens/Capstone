@@ -26,3 +26,9 @@ class RecordForm(Form):
 class UserForm(Form):
     username = StringField('Username', [validators.Length(min=1, max=50)])
     password = StringField('Password', [validators.DataRequired()])
+
+class EmailForm(Form):
+    send_date = DateField('Send Date', format='%Y-%m-%d')
+    recipients = StringField('To: ')
+    subject = StringField('Subject: ')
+    message = TextAreaField('Body')

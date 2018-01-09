@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>Create a new Email</h1>
+  {% from "includes/_formhelpers.html" import render_field %}
+  <form action= "" method="post">
+    <div class="form-group">
+      {{ render_field(form.send_date, class_="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ render_field(form.recipients, class_="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ render_field(form.subject, class_="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ render_field(form.message, class_="form-control", id="editor") }}
+    </div>
+    <p><input type="submit" class="btn btn-primary" value="Submit"></p>
+  </form>
+{% endblock %}
