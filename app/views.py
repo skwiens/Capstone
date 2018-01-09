@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect, session, flash
 from . import app
-from .forms import VolunteerForm, RecordForm, UserForm
-from .models import Record, Volunteer, User
+from .forms import VolunteerForm, RecordForm, UserForm, EmailForm
+from .models import Record, Volunteer, User, Email
 from app import db
 from functools import wraps
 
@@ -193,6 +193,24 @@ def records():
         msg = 'No Records Found'
         return render_template('records.html', msg=msg)
 
+@app.route('/add_email', methods=['GET', 'POST'])
+def add_email():
+    form = EmailForm(request.form)
+    if request.method == 'POST' and form.validate():
+        new_email = Email(
+            send_date = form.send_date.data,
+            recipients = form.recipients.data,
+            subject = form.subject.data,
+            message = form.message.data
+        )
 
+        db.session.add(new_email)
+        db.session.commit()
+
+        flash('Email created but not sent', 'success')
+
+        return redirect(url_for('index'))
+
+    return render_template('new_email.html', form=form)
 if __name__ == '__main__':
     app.run()
