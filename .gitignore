@@ -13,3 +13,5 @@ config
 migrations
 
 Bethany_Food_Bank.egg-info
+
+client_secret.json

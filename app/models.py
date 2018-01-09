@@ -49,3 +49,9 @@ class Record(db.Model):
 
     def __repr__(self):
         return "<Record '{}'>".format(self.title)
+
+class Admin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    tokens = db.Column(db.Text)
+    active = db.Column(db.Boolean, default=False)
