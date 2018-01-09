@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from .config import app_config
+from flask_login import LoginManager
 
 app = Flask(__name__, instance_relative_config=True)
 

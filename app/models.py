@@ -50,7 +50,13 @@ class Record(db.Model):
     def __repr__(self):
         return "<Record '{}'>".format(self.title)
 
-
+class Email(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    send_date = db.Column(db.DateTime())
+    recipients = db.Column(db.String(255))
+    subject = db.Column(db.String(255))
+    message = db.Column(db.Text())
+    
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
