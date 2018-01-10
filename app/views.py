@@ -4,6 +4,114 @@ from .forms import VolunteerForm, RecordForm, UserForm, EmailForm
 from .models import Record, Volunteer, User, Email
 from app import db
 from functools import wraps
+from flask_login import LoginManager, login_required, current_user, login_user, logout_user
+from requests_oauthlib import OAuth2Session
+from .config import Auth
+
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+import googleapiclient.discovery
+
+CLIENT_SECRETS_FILE = 'client_secret.json'
+SCOPES = ['https://www.googleapis.com/auth/gmail.compose']
+API_SERVICE_NAME = 'gmail'
+API_VERSION = 'v1'
+
+import os
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+@app.route('/admin_login')
+def test_api_request():
+    if 'credentials' not in session:
+        return redirect('authorize')
+
+    # Load credentials from the session.
+    credentials = google.oauth2.credentials.Credentials(
+      **session['credentials'])
+
+    service = googleapiclient.discovery.build(
+      API_SERVICE_NAME, API_VERSION, credentials=credentials)
+
+    if service:
+        print('Successfully accessed gmail')
+        if 'user' in session:
+            print(session['user'])
+        else:
+            print('no user in session')
+
+    return redirect(url_for('index'))
+
+
+@app.route('/authorize')
+def authorize():
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+      CLIENT_SECRETS_FILE, scopes=SCOPES)
+
+    flow.redirect_uri = url_for('oauth2callback', _external=True)
+
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true')
+
+    session['state'] = state
+
+    return redirect(authorization_url)
+
+@app.route('/oauth2callback')
+def oauth2callback():
+    state = session['state']
+
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+      CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
+    flow.redirect_uri = url_for('oauth2callback', _external=True)
+
+    authorization_response = request.url
+    flow.fetch_token(authorization_response=authorization_response)
+
+    credentials = flow.credentials
+    session['credentials'] = credentials_to_dict(credentials)
+    session['user'] = 'admin'
+
+
+    return redirect(url_for('test_api_request'))
+
+
+@app.route('/revoke')
+def revoke():
+  if 'credentials' not in session:
+    return ('You need to <a href="/authorize">authorize</a> before ' +
+            'testing the code to revoke credentials.')
+
+  credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+
+  revoke = requests.post('https://accounts.google.com/o/oauth2/revoke',
+      params={'token': credentials.token},
+      headers = {'content-type': 'application/x-www-form-urlencoded'})
+
+  status_code = getattr(revoke, 'status_code')
+  if status_code == 200:
+    return('Credentials successfully revoked.' + print_index_table())
+  else:
+    return('An error occurred.' + print_index_table())
+
+@app.route('/clear')
+def clear_credentials():
+  if 'credentials' in session:
+    del session['credentials']
+  if 'user' in session:
+    del session['user']
+  return ('Credentials have been cleared.<br><br>')
+
+
+def credentials_to_dict(credentials):
+  return {'token': credentials.token,
+          'refresh_token': credentials.refresh_token,
+          'token_uri': credentials.token_uri,
+          'client_id': credentials.client_id,
+          'client_secret': credentials.client_secret,
+          'scopes': credentials.scopes}
+
+
 
 from OpenSSL import SSL
 context = SSL.Context(SSL.SSLv23_METHOD)
@@ -13,7 +121,6 @@ context.use_certificate_file('localhost.crt')
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 @app.route('/add_volunteer', methods=['GET', 'POST'])
 def add_volunteer():
@@ -104,8 +211,8 @@ def new_user():
     else:
         return render_template('user.html', form=form)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/user_login', methods=['GET', 'POST'])
+def user_login():
     if request.method == 'POST':
         username = request.form['username']
         password_candidate = request.form['password']
@@ -122,22 +229,14 @@ def login():
                 return redirect(url_for('index'))
             else:
                 error = 'Invalid login'
-                return render_template('login.html', error=error)
+                return render_template('user_login.html', error=error)
         else:
-            return render_template('login.html')
+            return render_template('user_login.html')
             error='Username not found'
-            return render_template('login.html', error=error)
-    return render_template('login.html')
+            return render_template('user_login.html', error=error)
+    return render_template('user_login.html')
 
-# def is_logged_in(f):
-#     @wraps(f)
-#     def wrap(*args, **kwargs):
-#         if 'logged_in' in session:
-#             return f(*args, **kwargs)
-#         else:
-#             flash('Please log in to see this page', 'danger')
-#             return redirect(url_for('login'))
-#     return wrap
+
 
 def user_logged_in(f):
     @wraps(f)
@@ -146,7 +245,7 @@ def user_logged_in(f):
             return f(*args, **kwargs)
         else:
             flash('Please log in to see this page', 'danger')
-            return redirect(url_for('login'))
+            return redirect(url_for('user_login'))
     return wrap
 
 
@@ -222,5 +321,11 @@ def add_email():
         return redirect(url_for('index'))
 
     return render_template('new_email.html', form=form)
+
+@app.route('/send_email')
+def send_message():
+    main()
+
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1',port='12344', debug = False/True, ssl_context=context)
