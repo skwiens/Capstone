@@ -5,6 +5,11 @@ from .models import Record, Volunteer, User, Email
 from app import db
 from functools import wraps
 
+from OpenSSL import SSL
+context = SSL.Context(SSL.SSLv23_METHOD)
+context.use_privatekey_file('localhost.key')
+context.use_certificate_file('localhost.crt')
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -218,4 +223,4 @@ def add_email():
 
     return render_template('new_email.html', form=form)
 if __name__ == '__main__':
-    app.run()
+    app.run(host='127.0.0.1',port='12344', debug = False/True, ssl_context=context)
