@@ -35,7 +35,6 @@ def admin_login():
     if service:
         user_profile = service.users().getProfile(userId='me').execute()
         emailAddress = user_profile['emailAddress']
-        print(emailAddress)
         if user_profile['emailAddress'] == 'xana.wines.ada@gmail.com':
             session['user'] = 'admin'
             flash('You are now logged in as an administrator', 'success')
@@ -97,9 +96,9 @@ def revoke():
 
   status_code = getattr(revoke, 'status_code')
   if status_code == 200:
-    return('Credentials successfully revoked.' + print_index_table())
+    return('Credentials successfully revoked.')
   else:
-    return('An error occurred.' + print_index_table())
+    return('An error occurred.')
 
 # @app.route('/clear')
 # def clear_credentials():
@@ -130,6 +129,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/add_volunteer', methods=['GET', 'POST'])
+@admin_logged_in
 def add_volunteer():
     form = VolunteerForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -150,6 +150,7 @@ def add_volunteer():
 
 
 @app.route('/volunteer/edit/<string:id>', methods=['GET', 'POST'])
+@admin_logged_in
 def edit_volunteer(id):
 
     volunteer = Volunteer.query.get(id)
@@ -168,6 +169,7 @@ def edit_volunteer(id):
 
 
 @app.route('/volunteers')
+@admin_logged_in
 def volunteers():
     volunteers = Volunteer.query.all()
 
@@ -179,6 +181,7 @@ def volunteers():
 
 
 @app.route('/edit_user', methods=['GET', 'POST'])
+@admin_logged_in
 def edit_user():
 
     user = User.query.get(1)
@@ -197,6 +200,7 @@ def edit_user():
 
 
 @app.route('/add_user', methods=['GET', 'POST'])
+@admin_logged_in
 def new_user():
 
     form = UserForm(request.form)
@@ -250,7 +254,17 @@ def user_logged_in(f):
         if 'logged_in_user' in session:
             return f(*args, **kwargs)
         else:
-            flash('Please log in to see this page', 'danger')
+            flash('Please log in as a volunteer to see this page', 'danger')
+            return redirect(url_for('user_login'))
+    return wrap
+
+def admin_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'user' in session and session['user'] == 'admin':
+            return f(*args, **kwargs)
+        else:
+            flash('Please log in as an administrator to see this page', 'danger')
             return redirect(url_for('user_login'))
     return wrap
 
@@ -262,6 +276,7 @@ def logout():
 
 
 @app.route('/record/<string:id>')
+@admin_logged_in
 def record(id):
     record = Record.query.get(id)
 
@@ -298,6 +313,7 @@ def add_record():
 
 
 @app.route('/records')
+@admin_logged_in
 def records():
     records = Record.query.all()
 
@@ -308,6 +324,7 @@ def records():
         return render_template('records.html', msg=msg)
 
 @app.route('/add_email', methods=['GET', 'POST'])
+@admin_logged_in
 def add_email():
     form = EmailForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -327,9 +344,8 @@ def add_email():
 
     return render_template('new_email.html', form=form)
 
-@app.route('/send_email')
-def send_message():
-    main()
+# @app.route('/send_email')
+# def send_message():
 
 
 if __name__ == '__main__':

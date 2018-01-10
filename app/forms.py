@@ -13,8 +13,6 @@ def volunteer_query():
     volunteers = Volunteer.query.all()
     volunteer_list = [(volunteer.id, volunteer.name) for volunteer in volunteers]
 
-    print(volunteer_list)
-
     return volunteer_list
 
 class VolunteerForm(Form):
