@@ -20,6 +20,26 @@ API_VERSION = 'v1'
 import os
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
+def user_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in_user' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Please log in to see this page', 'danger')
+            return redirect(url_for('user_login'))
+    return wrap
+
+def admin_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'user' in session and session['user']=='admin':
+            return f(*args, **kwargs)
+        else:
+            flash('You must have admin privileges to complete this action', 'danger')
+            return redirect(url_for('index'))
+    return wrap
+
 @app.route('/admin_login')
 def admin_login():
     if 'credentials' not in session:
@@ -247,27 +267,6 @@ def user_login():
             return render_template('user_login.html', error=error)
     return render_template('user_login.html')
 
-
-def user_logged_in(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in_user' in session:
-            return f(*args, **kwargs)
-        else:
-            flash('Please log in as a volunteer to see this page', 'danger')
-            return redirect(url_for('user_login'))
-    return wrap
-
-def admin_logged_in(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'user' in session and session['user'] == 'admin':
-            return f(*args, **kwargs)
-        else:
-            flash('Please log in as an administrator to see this page', 'danger')
-            return redirect(url_for('user_login'))
-    return wrap
-
 @app.route('/logout')
 def logout():
     session.clear()
@@ -346,6 +345,7 @@ def add_email():
 
 # @app.route('/send_email')
 # def send_message():
+#     main()
 
 
 if __name__ == '__main__':
