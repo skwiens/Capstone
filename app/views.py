@@ -21,7 +21,7 @@ import os
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 @app.route('/admin_login')
-def test_api_request():
+def admin_login():
     if 'credentials' not in session:
         return redirect('authorize')
 
@@ -33,11 +33,19 @@ def test_api_request():
       API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
     if service:
-        print('Successfully accessed gmail')
-        if 'user' in session:
-            print(session['user'])
+        user_profile = service.users().getProfile(userId='me').execute()
+        emailAddress = user_profile['emailAddress']
+        print(emailAddress)
+        if user_profile['emailAddress'] == 'xana.wines.ada@gmail.com':
+            session['user'] = 'admin'
+            flash('You are now logged in as an administrator', 'success')
+            # redirect(url_for('index'))
         else:
-            print('no user in session')
+            flash('You do not have admin privileges, please contact Bethany Food Bank if you have any questions', 'danger')
+            redirect(url_for('clear'))
+    else:
+        flash('Sorry! Something went wrong. Please try again in a few moments', 'danger')
+
 
     return redirect(url_for('index'))
 
@@ -70,10 +78,9 @@ def oauth2callback():
 
     credentials = flow.credentials
     session['credentials'] = credentials_to_dict(credentials)
-    session['user'] = 'admin'
 
 
-    return redirect(url_for('test_api_request'))
+    return redirect(url_for('admin_login'))
 
 
 @app.route('/revoke')
@@ -94,13 +101,13 @@ def revoke():
   else:
     return('An error occurred.' + print_index_table())
 
-@app.route('/clear')
-def clear_credentials():
-  if 'credentials' in session:
-    del session['credentials']
-  if 'user' in session:
-    del session['user']
-  return ('Credentials have been cleared.<br><br>')
+# @app.route('/clear')
+# def clear_credentials():
+#   if 'credentials' in session:
+#     del session['credentials']
+#   if 'user' in session:
+#     del session['user']
+#   return redirect(url_for('index'))
 
 
 def credentials_to_dict(credentials):
@@ -112,6 +119,11 @@ def credentials_to_dict(credentials):
           'scopes': credentials.scopes}
 
 
+
+# from OpenSSL import SSL
+# context = SSL.Context(SSL.SSLv23_METHOD)
+# context.use_privatekey_file('localhost.key')
+# context.use_certificate_file('localhost.crt')
 
 @app.route('/')
 def index():
@@ -232,7 +244,6 @@ def user_login():
     return render_template('user_login.html')
 
 
-
 def user_logged_in(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -242,7 +253,6 @@ def user_logged_in(f):
             flash('Please log in to see this page', 'danger')
             return redirect(url_for('user_login'))
     return wrap
-
 
 @app.route('/logout')
 def logout():
@@ -262,6 +272,11 @@ def record(id):
 @user_logged_in
 def add_record():
     form = RecordForm(request.form)
+
+    volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.all()]
+
+    form.author.choices = volunteer_list
+
     if request.method == 'POST' and form.validate():
         new_record = Record(
             author = form.author.data,
@@ -318,4 +333,4 @@ def send_message():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='127.0.0.1',port='12344', debug = False/True, ssl_context=context)
