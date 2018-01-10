@@ -20,6 +20,26 @@ API_VERSION = 'v1'
 import os
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
+def user_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in_user' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Please log in to see this page', 'danger')
+            return redirect(url_for('user_login'))
+    return wrap
+
+def admin_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'user' in session and session['user']=='admin':
+            return f(*args, **kwargs)
+        else:
+            flash('You must have admin privileges to complete this action', 'danger')
+            return redirect(url_for('index'))
+    return wrap
+
 @app.route('/admin_login')
 def admin_login():
     if 'credentials' not in session:
@@ -130,6 +150,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/add_volunteer', methods=['GET', 'POST'])
+@admin_logged_in
 def add_volunteer():
     form = VolunteerForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -150,6 +171,7 @@ def add_volunteer():
 
 
 @app.route('/volunteer/edit/<string:id>', methods=['GET', 'POST'])
+@admin_logged_in
 def edit_volunteer(id):
 
     volunteer = Volunteer.query.get(id)
@@ -168,6 +190,7 @@ def edit_volunteer(id):
 
 
 @app.route('/volunteers')
+@admin_logged_in
 def volunteers():
     volunteers = Volunteer.query.all()
 
@@ -179,6 +202,7 @@ def volunteers():
 
 
 @app.route('/edit_user', methods=['GET', 'POST'])
+@admin_logged_in
 def edit_user():
 
     user = User.query.get(1)
@@ -197,6 +221,7 @@ def edit_user():
 
 
 @app.route('/add_user', methods=['GET', 'POST'])
+@admin_logged_in
 def new_user():
 
     form = UserForm(request.form)
@@ -243,17 +268,6 @@ def user_login():
             return render_template('user_login.html', error=error)
     return render_template('user_login.html')
 
-
-def user_logged_in(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in_user' in session:
-            return f(*args, **kwargs)
-        else:
-            flash('Please log in to see this page', 'danger')
-            return redirect(url_for('user_login'))
-    return wrap
-
 @app.route('/logout')
 def logout():
     session.clear()
@@ -298,6 +312,7 @@ def add_record():
 
 
 @app.route('/records')
+@admin_logged_in
 def records():
     records = Record.query.all()
 
@@ -308,6 +323,7 @@ def records():
         return render_template('records.html', msg=msg)
 
 @app.route('/add_email', methods=['GET', 'POST'])
+@admin_logged_in
 def add_email():
     form = EmailForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -327,9 +343,9 @@ def add_email():
 
     return render_template('new_email.html', form=form)
 
-@app.route('/send_email')
-def send_message():
-    main()
+# @app.route('/send_email')
+# def send_message():
+#     main()
 
 
 if __name__ == '__main__':
