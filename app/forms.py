@@ -7,6 +7,16 @@ from wtforms.fields.html5 import DateField
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Email
 
+from .models import Volunteer
+
+def volunteer_query():
+    volunteers = Volunteer.query.all()
+    volunteer_list = [(volunteer.id, volunteer.name) for volunteer in volunteers]
+
+    print(volunteer_list)
+
+    return volunteer_list
+
 class VolunteerForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
     email = StringField('Email', [validators.DataRequired(), validators.Email(), validators.Length(min=6, max=50)])
@@ -14,14 +24,16 @@ class VolunteerForm(Form):
     role = SelectField('Role', choices = [('open-hours', 'open-hours'), ('shopper','shoppers'), ('both', 'both')] )
 
 class RecordForm(Form):
-    # author = QuerySelectField(query_factory=volunteer_query, allow_blank=True, get_label='name')
-    author = StringField('Name')
+    choices = volunteer_query()
+    author = SelectField('Author', choices=choices)
+    # author = StringField('Name')
     # author = QuerySelectField(query_factory=volunteer_query, allow_blank=True)
     date = DateField('Date', format='%Y-%m-%d')
     volunteers = StringField('Volunteers')
     customers = IntegerField('Number of Customers')
     notes = TextAreaField('Notes')
     shopping = TextAreaField('Shopping List')
+
 
 class UserForm(Form):
     username = StringField('Username', [validators.Length(min=1, max=50)])

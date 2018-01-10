@@ -163,6 +163,11 @@ def record(id):
 @user_logged_in
 def add_record():
     form = RecordForm(request.form)
+
+    volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.all()]
+
+    form.author.choices = volunteer_list
+
     if request.method == 'POST' and form.validate():
         new_record = Record(
             author = form.author.data,
