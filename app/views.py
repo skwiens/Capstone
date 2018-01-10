@@ -17,8 +17,10 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.compose']
 API_SERVICE_NAME = 'gmail'
 API_VERSION = 'v1'
 
+import os
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-@app.route('/test')
+@app.route('/admin_login')
 def test_api_request():
     if 'credentials' not in session:
         return redirect('authorize')
@@ -27,14 +29,17 @@ def test_api_request():
     credentials = google.oauth2.credentials.Credentials(
       **session['credentials'])
 
-    drive = googleapiclient.discovery.build(
+    service = googleapiclient.discovery.build(
       API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
-    files = drive.files().list().execute()
+    if service:
+        print('Successfully accessed gmail')
+        if 'user' in session:
+            print(session['user'])
+        else:
+            print('no user in session')
 
-    session['credentials'] = credentials_to_dict(credentials)
-
-    return jsonify(**files)
+    return redirect(url_for('index'))
 
 
 @app.route('/authorize')
@@ -65,8 +70,10 @@ def oauth2callback():
 
     credentials = flow.credentials
     session['credentials'] = credentials_to_dict(credentials)
+    session['user'] = 'admin'
 
-    return redirect(flask.url_for('test_api_request'))
+
+    return redirect(url_for('test_api_request'))
 
 
 @app.route('/revoke')
@@ -89,10 +96,11 @@ def revoke():
 
 @app.route('/clear')
 def clear_credentials():
-  if 'credentials' in flask.session:
-    del flask.session['credentials']
-  return ('Credentials have been cleared.<br><br>' +
-          print_index_table())
+  if 'credentials' in session:
+    del session['credentials']
+  if 'user' in session:
+    del session['user']
+  return ('Credentials have been cleared.<br><br>')
 
 
 def credentials_to_dict(credentials):
@@ -106,7 +114,6 @@ def credentials_to_dict(credentials):
 
 
 @app.route('/')
-@login_required
 def index():
     return render_template('index.html')
 
@@ -199,7 +206,7 @@ def new_user():
     else:
         return render_template('user.html', form=form)
 
-@app.route('/user/login', methods=['GET', 'POST'])
+@app.route('/user_login', methods=['GET', 'POST'])
 def user_login():
     if request.method == 'POST':
         username = request.form['username']
@@ -233,7 +240,7 @@ def user_logged_in(f):
             return f(*args, **kwargs)
         else:
             flash('Please log in to see this page', 'danger')
-            return redirect(url_for('login'))
+            return redirect(url_for('user_login'))
     return wrap
 
 
