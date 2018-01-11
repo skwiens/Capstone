@@ -8,11 +8,15 @@ from flask_login import LoginManager, login_required, current_user, login_user, 
 from requests_oauthlib import OAuth2Session
 from .config import Auth
 
+import os
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 
-# CLIENT_SECRETS_FILE = 'client_secret.json'
+
+#### HELP!  NEED THIS TO BE NOT A FILE! #####
+CLIENT_SECRETS_FILE = 'client_secret.json'
+# CLIENT_SECRETS_FILE = os.environ['CLIENT_SECRETS_FILE']
 SCOPES = ['https://www.googleapis.com/auth/gmail.compose']
 API_SERVICE_NAME = 'gmail'
 API_VERSION = 'v1'
