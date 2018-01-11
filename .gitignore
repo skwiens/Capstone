@@ -2,8 +2,6 @@
 
 .env
 
-config.py
-
 *.pyc
 
 venv
@@ -13,3 +11,13 @@ config
 migrations
 
 Bethany_Food_Bank.egg-info
+
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+client_secret.json
+
+rundev.sh

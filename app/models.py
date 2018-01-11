@@ -63,3 +63,9 @@ class Email(db.Model):
     recipients = db.Column(db.String(255))
     subject = db.Column(db.String(255))
     message = db.Column(db.Text())
+
+class Admin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    tokens = db.Column(db.Text)
+    active = db.Column(db.Boolean, default=False)

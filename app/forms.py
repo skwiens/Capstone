@@ -9,13 +9,11 @@ from wtforms.validators import DataRequired, Email
 
 from .models import Volunteer
 
-def volunteer_query():
-    volunteers = Volunteer.query.all()
-    volunteer_list = [(volunteer.id, volunteer.name) for volunteer in volunteers]
-
-    print(volunteer_list)
-
-    return volunteer_list
+# def volunteer_query():
+#     volunteers = Volunteer.query.all()
+#     volunteer_list = [(volunteer.id, volunteer.name) for volunteer in volunteers]
+#
+#     return volunteer_list
 
 class VolunteerForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=50)])
@@ -24,7 +22,8 @@ class VolunteerForm(Form):
     role = SelectField('Role', choices = [('open-hours', 'open-hours'), ('shopper','shoppers'), ('both', 'both')] )
 
 class RecordForm(Form):
-    choices = volunteer_query()
+    # choices = volunteer_query()
+    choices=[('none', 'none')]
     author = SelectField('Author', choices=choices)
     # author = StringField('Name')
     # author = QuerySelectField(query_factory=volunteer_query, allow_blank=True)
