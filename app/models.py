@@ -14,12 +14,12 @@ class User(db.Model):
     def __repr__(self):
         return "<User'{}'>".format(self.username)
 
-class Volunteer(db.Model):
+class Volunteer(db.Model, UserMixin):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(100))
     role = db.Column(db.String(50))
     email = db.Column(db.String(255), unique=True, nullable=False)
-    # records = db.relationship('Record', backref='volunteer', lazy='dynamic')
+    # openhours = db.relationship('OpenHour', secondary=openhours, backref='volunteer', lazy='subquery')
 
     def __init__(self, name, email, role):
         self.name = name
@@ -29,26 +29,33 @@ class Volunteer(db.Model):
     def __repr__(self):
         return "<Volunteer '{}'>".format(self.name)
 
-class Record(db.Model):
+
+openhours = db.Table('openhour_volunteers',
+    db.Column('openhour_id', db.Integer, db.ForeignKey('openhour.id')),
+    db.Column('volunteer_id', db.Integer, db.ForeignKey('volunteer.id'))
+)
+
+class OpenHour(db.Model, UserMixin):
     id = db.Column(db.Integer(), primary_key=True)
     # author = db.Column(db.Integer(), db.ForeignKey('volunteer.id'))
     author = db.Column(db.String(255))
     date = db.Column(db.DateTime())
-    volunteers = db.Column(db.String(255))
-    customers = db.Column(db.Integer())
-    notes = db.Column(db.Text())
-    shopping = db.Column(db.Text())
+    volunteers = db.relationship('Volunteer', secondary=openhours, backref='openhours', lazy='dynamic')
+    # volunteers = db.Column(db.String(255))
+    # customers = db.Column(db.Integer())
+    # notes = db.Column(db.Text())
+    # shopping = db.Column(db.Text())
 
     def __init__(self, author, date, volunteers, customers, notes, shopping):
         self.author = author
         self.date = date
         self.volunteers = volunteers
-        self.customers = customers
-        self.notes = notes
-        self.shopping = shopping
+        # self.customers = customers
+        # self.notes = notes
+        # self.shopping = shopping
 
     def __repr__(self):
-        return "<Record '{}'>".format(self.title)
+        return "<Record '{}'>".format(self.date)
 
 class Email(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
