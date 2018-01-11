@@ -2,8 +2,6 @@
 
 .env
 
-config.py
-
 *.pyc
 
 venv
@@ -21,3 +19,5 @@ Bethany_Food_Bank.egg-info
 !.elasticbeanstalk/*.global.yml
 
 client_secret.json
+
+rundev.sh
