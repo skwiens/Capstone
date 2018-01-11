@@ -349,4 +349,4 @@ def add_email():
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1',port='12344', debug = False/True, ssl_context=context)
+    app.run()
