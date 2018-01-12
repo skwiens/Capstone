@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, url_for, redirect, session, flash
 from . import app
-from .forms import VolunteerForm, RecordForm, UserForm, EmailForm
+from .forms import VolunteerForm, OpenhourForm, UserForm, EmailForm
 from .models import Volunteer, Openhour, User, Email
 from app import db
 from functools import wraps
@@ -153,7 +153,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/add_volunteer', methods=['GET', 'POST'])
-@admin_logged_in
+# @admin_logged_in
 def add_volunteer():
     form = VolunteerForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -174,7 +174,7 @@ def add_volunteer():
 
 
 @app.route('/volunteer/edit/<string:id>', methods=['GET', 'POST'])
-@admin_logged_in
+# @admin_logged_in
 def edit_volunteer(id):
 
     volunteer = Volunteer.query.get(id)
@@ -193,7 +193,7 @@ def edit_volunteer(id):
 
 
 @app.route('/volunteers')
-@admin_logged_in
+# @admin_logged_in
 def volunteers():
     volunteers = Volunteer.query.all()
 
@@ -205,7 +205,7 @@ def volunteers():
 
 
 @app.route('/edit_user', methods=['GET', 'POST'])
-@admin_logged_in
+# @admin_logged_in
 def edit_user():
 
     user = User.query.get(1)
@@ -224,7 +224,7 @@ def edit_user():
 
 
 @app.route('/add_user', methods=['GET', 'POST'])
-@admin_logged_in
+# @admin_logged_in
 def new_user():
 
     form = UserForm(request.form)
@@ -278,56 +278,56 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/record/<string:id>')
-@admin_logged_in
-def record(id):
-    record = Record.query.get(id)
+@app.route('/openhour/<string:id>')
+# @admin_logged_in
+def openhour(id):
+    openhour = Openhour.query.get(id)
 
-    return render_template('record.html', record=record)
+    return render_template('record.html', openhour=openhour)
 
 
-@app.route('/add_record', methods=['GET', 'POST'])
-@user_logged_in
-def add_record():
-    form = RecordForm(request.form)
+@app.route('/add_openhour', methods=['GET', 'POST'])
+# @user_logged_in
+def add_openhour():
+    form = OpenhourForm(request.form)
 
     volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.all()]
-
-    form.author.choices = volunteer_list
+    form.volunteer.choices = volunteer_list
 
     if request.method == 'POST' and form.validate():
-        new_record = Record(
-            author = form.author.data,
+        new_openhour = Openhour(
+            # author = form.author.data,
             date = form.date.data,
-            volunteers = form.volunteers.data,
-            customers = form.customers.data,
-            notes = form.notes.data,
-            shopping = form.shopping.data
+            # volunteer = Volunteer.query.get(form.volunteer.data)
+            # customers = form.customers.data,
+            # notes = form.notes.data,
+            # shopping = form.shopping.data
         )
 
-        db.session.add(new_record)
+        db.session.add(new_openhour)
+        new_openhour.volunteer.append(Volunteer.query.get(form.volunteer.data))
         db.session.commit()
 
-        flash('Record for ' + new_record.date.strftime('%m/%d/%Y') + 'saved! Thank you for volunteering with us!', 'success')
+        flash('Record for ' + new_openhour.date.strftime('%m/%d/%Y') + 'saved! Thank you for volunteering with us!', 'success')
 
         return redirect(url_for('index'))
 
-    return render_template('add_record.html', form=form)
+    return render_template('add_openhour.html', form=form)
 
 
-@app.route('/records')
-@admin_logged_in
-def records():
-    records = Record.query.all()
+@app.route('/openhours')
+# @admin_logged_in
+def openhours():
+    openhours = Openhour.query.all()
 
-    if records:
-        return render_template('records.html', records=records)
+    if openhours:
+        return render_template('records.html', openhours=openhours)
     else:
         msg = 'No Records Found'
         return render_template('records.html', msg=msg)
 
 @app.route('/add_email', methods=['GET', 'POST'])
-@admin_logged_in
+# @admin_logged_in
 def add_email():
     form = EmailForm(request.form)
     if request.method == 'POST' and form.validate():

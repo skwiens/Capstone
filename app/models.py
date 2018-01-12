@@ -38,18 +38,18 @@ openhour_volunteers = db.Table('openhour_volunteers',
 class Openhour(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     # author = db.Column(db.Integer(), db.ForeignKey('volunteer.id'))
-    author = db.Column(db.String(255))
+    # author = db.Column(db.String(255))
     date = db.Column(db.DateTime())
-    volunteers = db.relationship('Volunteer', secondary=openhour_volunteers, backref='openhour', lazy='dynamic')
+    volunteer = db.relationship('Volunteer', secondary=openhour_volunteers, backref='openhour', lazy='dynamic')
     # volunteers = db.Column(db.String(255))
     # customers = db.Column(db.Integer())
     # notes = db.Column(db.Text())
     # shopping = db.Column(db.Text())
 
-    def __init__(self, author, date, volunteers, customers, notes, shopping):
-        self.author = author
+    def __init__(self, date):
+        # self.author = author
         self.date = date
-        self.volunteers = volunteers
+        # self.volunteer = volunteer
         # self.customers = customers
         # self.notes = notes
         # self.shopping = shopping

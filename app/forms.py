@@ -21,17 +21,17 @@ class VolunteerForm(Form):
     role = StringField('Role')
     role = SelectField('Role', choices = [('open-hours', 'open-hours'), ('shopper','shoppers'), ('both', 'both')] )
 
-class RecordForm(Form):
+class OpenhourForm(Form):
     # choices = volunteer_query()
-    choices=[('none', 'none')]
-    author = SelectField('Author', choices=choices)
+    # choices=[('none', 'none')]
+    # author = SelectField('Author', choices=choices)
     # author = StringField('Name')
     # author = QuerySelectField(query_factory=volunteer_query, allow_blank=True)
     date = DateField('Date', format='%Y-%m-%d')
-    volunteers = StringField('Volunteers')
-    customers = IntegerField('Number of Customers')
-    notes = TextAreaField('Notes')
-    shopping = TextAreaField('Shopping List')
+    volunteer = SelectField('Volunteer', coerce=int)
+    # customers = IntegerField('Number of Customers')
+    # notes = TextAreaField('Notes')
+    # shopping = TextAreaField('Shopping List')
 
 
 class UserForm(Form):
