@@ -215,7 +215,7 @@ def edit_user():
 
         db.session.commit()
 
-        flash('User login updated')
+        flash('User login updated', 'success')
 
         return redirect(url_for('index'))
     else:
@@ -239,7 +239,7 @@ def new_user():
 
         db.session.commit()
 
-        flash('User login updated')
+        flash('User login updated', 'success')
 
         return redirect(url_for('index'))
     else:
