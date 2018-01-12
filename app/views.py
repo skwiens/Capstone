@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect, session, flash
 from . import app
-from .forms import VolunteerForm, OpenhourForm, UserForm, EmailForm
-from .models import Volunteer, Openhour, User, Email
+from .forms import VolunteerForm, OpenhourForm, UserForm, EmailForm, NoteForm
+from .models import Volunteer, Openhour, User, Email, Note
 from app import db
 from functools import wraps
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
@@ -199,7 +199,7 @@ def volunteers():
     if volunteers:
         return render_template('volunteers.html', volunteers=volunteers)
     else:
-        msg = 'No Records Found'
+        msg = 'No Open Hours Found'
         return render_template('volunteers.html', msg=msg)
 
 
@@ -305,7 +305,7 @@ def add_openhour():
         )
 
         db.session.add(new_openhour)
-        new_openhour.volunteer.append(Volunteer.query.get(form.volunteer.data))
+        new_openhour.volunteers.append(Volunteer.query.get(form.volunteer.data))
         db.session.commit()
 
         flash('Record for ' + new_openhour.date.strftime('%m/%d/%Y') + 'saved! Thank you for volunteering with us!', 'success')
@@ -321,10 +321,10 @@ def openhours():
     openhours = Openhour.query.all()
 
     if openhours:
-        return render_template('records.html', openhours=openhours)
+        return render_template('openhours.html', openhours=openhours)
     else:
-        msg = 'No Records Found'
-        return render_template('records.html', msg=msg)
+        msg = 'No Open Hours Found'
+        return render_template('openhours.html', msg=msg)
 
 @app.route('/add_email', methods=['GET', 'POST'])
 # @admin_logged_in
@@ -347,10 +347,42 @@ def add_email():
 
     return render_template('new_email.html', form=form)
 
+@app.route('/openhour/<string:id>/add_note', methods=['GET', 'POST'])
+def add_note(id):
+    form = NoteForm(request.form)
+
+    volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.all()]
+    form.author.choices = volunteer_list
+
+    if request.method == 'POST' and form.validate():
+        new_note = Note(
+            openhour_id = id,
+            author = form.author.data,
+            customers = form.customers.data,
+            body = form.body.data,
+            shopping = form.shopping.data
+        )
+
+        db.session.add(new_note)
+        db.session.commit()
+
+        flash('Notes created for' + Openhour.query.get(id).date.strftime('%m/%d/%Y') + '. Thank You!', 'success')
+
+        return redirect(url_for('index'))
+
+    return render_template('add_note.html', form=form)
+
+@app.route('/openhour/<string:id>/note')
+def note(id):
+    openhour = Openhour.query.get(id)
+    note = openhour.notes[0]
+
+    return render_template('note.html', note=note, openhour=openhour)
+
 # @app.route('/send_email')
 # def send_message():
 #     main()
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

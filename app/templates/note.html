@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>Date: {{ openhour.date.strftime('%m/%d/%Y') }}</h1>
+  <small>Written by {{ note.author }}</small>
+  <hr>
+  <div class="">
+    <ul class="list-group">
+      <li class="list-group-item">Volunteers:
+        {% for volunteer in openhour.volunteers %}
+          <span>{{volunteer.name}}</span>
+        {% endfor %}
+      </li>
+      <li class="list-group-item">Customers: {{ note.customers }}</li>
+      <li class="list-group-item">Notes: {{ note.body }}</li>
+      <li class="list-group-item">Shopping List: {{ note.shopping }}</li>
+    </ul>
+  </div>
+{% endblock %}

@@ -41,7 +41,7 @@ class Openhour(db.Model):
     # author = db.Column(db.Integer(), db.ForeignKey('volunteer.id'))
     # author = db.Column(db.String(255))
     date = db.Column(db.DateTime())
-    volunteer = db.relationship('Volunteer', secondary=openhour_volunteers, backref='openhourvols', lazy='dynamic')
+    volunteers = db.relationship('Volunteer', secondary=openhour_volunteers, backref='openhourvols', lazy='dynamic')
     notes = db.relationship('Note', backref='openhournotes', lazy=True)
     # volunteers = db.Column(db.String(255))
     # customers = db.Column(db.Integer())
@@ -57,7 +57,7 @@ class Openhour(db.Model):
         # self.shopping = shopping
 
     def __repr__(self):
-        return "<Record '{}'>".format(self.date)
+        return "<Openhour '{}'>".format(self.date)
 
 class Note(db.Model):
     id=db.Column(db.Integer(), primary_key=True)
