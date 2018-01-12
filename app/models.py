@@ -14,12 +14,19 @@ class User(db.Model):
     def __repr__(self):
         return "<User'{}'>".format(self.username)
 
+openhour_volunteers = db.Table('openhour_volunteers',
+    db.Column('openhour_id', db.Integer, db.ForeignKey('openhour.id')),
+    db.Column('volunteer_id', db.Integer, db.ForeignKey('volunteer.id'))
+)
+
 class Volunteer(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(100))
     role = db.Column(db.String(50))
     email = db.Column(db.String(255), unique=True, nullable=False)
-    # openhours = db.relationship('OpenHour', secondary=openhours, backref='volunteer', lazy='subquery')
+    openhours = db.relationship('OpenHour', secondary=openhour_volunteers, backref='volunteer', lazy='subquery')
+    notes = db.relationship('Note', backref='openhour', lazy=True)
+
 
     def __init__(self, name, email, role):
         self.name = name
@@ -29,18 +36,13 @@ class Volunteer(db.Model):
     def __repr__(self):
         return "<Volunteer '{}'>".format(self.name)
 
-
-openhour_volunteers = db.Table('openhour_volunteers',
-    db.Column('openhour_id', db.Integer, db.ForeignKey('openhour.id')),
-    db.Column('volunteer_id', db.Integer, db.ForeignKey('volunteer.id'))
-)
-
 class Openhour(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     # author = db.Column(db.Integer(), db.ForeignKey('volunteer.id'))
     # author = db.Column(db.String(255))
     date = db.Column(db.DateTime())
     volunteer = db.relationship('Volunteer', secondary=openhour_volunteers, backref='openhour', lazy='dynamic')
+    notes = db.relationship('Note', backref='openhour', lazy=True)
     # volunteers = db.Column(db.String(255))
     # customers = db.Column(db.Integer())
     # notes = db.Column(db.Text())
@@ -56,6 +58,14 @@ class Openhour(db.Model):
 
     def __repr__(self):
         return "<Record '{}'>".format(self.date)
+
+class Note(db.Model):
+    id=db.Column(db.Integer(), primary_key=True)
+    openhour_id = db.Column(db.Integer, db.ForeignKey('openhour.id'), nullable=False)
+    author = db.Column(db.Integer(), db.ForeignKey('volunteer.id'))
+    customers = db.Column(db.Integer())
+    body = db.Column(db.Text())
+    shopping = db.Column(db.Text())
 
 class Email(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
