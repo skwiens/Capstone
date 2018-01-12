@@ -105,7 +105,6 @@ def oauth2callback():
 
     return redirect(url_for('admin_login'))
 
-
 @app.route('/revoke')
 def revoke():
   if 'credentials' not in session:
@@ -256,6 +255,7 @@ def user_login():
 
         if user:
             if password_candidate == user.password:
+                session['user'] = 'volunteer'
                 session['logged_in_user'] = True
                 session['username'] = username
                 # session['user'] = True
