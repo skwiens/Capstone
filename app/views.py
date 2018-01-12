@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect, session, flash
 from . import app
 from .forms import VolunteerForm, RecordForm, UserForm, EmailForm
-from .models import Record, Volunteer, User, Email
+from .models import Volunteer, Openhour, User, Email
 from app import db
 from functools import wraps
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user

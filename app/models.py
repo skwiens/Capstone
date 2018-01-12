@@ -14,7 +14,7 @@ class User(db.Model):
     def __repr__(self):
         return "<User'{}'>".format(self.username)
 
-class Volunteer(db.Model, UserMixin):
+class Volunteer(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(100))
     role = db.Column(db.String(50))
@@ -30,17 +30,17 @@ class Volunteer(db.Model, UserMixin):
         return "<Volunteer '{}'>".format(self.name)
 
 
-openhours = db.Table('openhour_volunteers',
+openhour_volunteers = db.Table('openhour_volunteers',
     db.Column('openhour_id', db.Integer, db.ForeignKey('openhour.id')),
     db.Column('volunteer_id', db.Integer, db.ForeignKey('volunteer.id'))
 )
 
-class OpenHour(db.Model, UserMixin):
+class Openhour(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     # author = db.Column(db.Integer(), db.ForeignKey('volunteer.id'))
     author = db.Column(db.String(255))
     date = db.Column(db.DateTime())
-    volunteers = db.relationship('Volunteer', secondary=openhours, backref='openhours', lazy='dynamic')
+    volunteers = db.relationship('Volunteer', secondary=openhour_volunteers, backref='openhour', lazy='dynamic')
     # volunteers = db.Column(db.String(255))
     # customers = db.Column(db.Integer())
     # notes = db.Column(db.Text())
