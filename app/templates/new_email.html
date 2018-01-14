@@ -4,6 +4,7 @@
   <h1>Create a new Email</h1>
   {% from "includes/_formhelpers.html" import render_field %}
   <form action= "" method="post">
+    {{ form.csrf_token }}
     <div class="form-group">
       {{ render_field(form.send_date, class_="form-control") }}
     </div>
