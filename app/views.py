@@ -61,8 +61,6 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
-
-
 def user_logged_in(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -522,15 +520,25 @@ def createMessageWithAttachment(
     return {'raw': base64.urlsafe_b64encode(message.as_string())}
 
 @app.route('/send_email')
+@admin_logged_in
 def send_email():
-    to = "xana.wines.ada@gmail.com"
+    email = Email.query.get(1)
+    print(email)
+    print(email.subject)
+    print(email.message)
+    to = email.recipients
     sender = "xana.wines.ada@gmail.com"
-    subject = "subject"
-    msgHtml = "Hi<br/>Html Email"
-    msgPlain = "Hi\nPlain Email"
+    subject = email.subject
+    msgHtml = email.message
+    msgPlain = email.message
+    # to = "xana.wines.ada@gmail.com"
+    # sender = "xana.wines.ada@gmail.com"
+    # subject = "subject"
+    # msgHtml = "Hi<br/>Html Email"
+    # msgPlain = "Hi\nPlain Email"
     SendMessage(sender, to, subject, msgHtml, msgPlain)
-    # Send message with attachment:
-    # SendMessage(sender, to, subject, msgHtml, msgPlain, '/path/to/file.pdf')
+    # # Send message with attachment:
+    # # SendMessage(sender, to, subject, msgHtml, msgPlain, '/path/to/file.pdf')
     flash('Hahahahahaha', 'success')
     return redirect(url_for('index'))
 
