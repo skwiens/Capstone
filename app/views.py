@@ -341,10 +341,9 @@ def add_openhour():
         )
 
         db.session.add(new_openhour)
-        
+
         for volunteer in form.volunteers.data:
             new_openhour.volunteers.append(Volunteer.query.get(volunteer))
-
 
         # new_openhour.volunteers.append(Volunteer.query.get(form.volunteers.data))
 
@@ -394,6 +393,9 @@ def add_note(id):
     form = NoteForm(request.form)
 
     volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.all()]
+
+    openhour = Openhour.query.get(id)
+
     form.author.choices = volunteer_list
 
     if request.method == 'POST' and form.validate():
@@ -408,7 +410,19 @@ def add_note(id):
         db.session.add(new_note)
         db.session.commit()
 
-        flash('Notes created for' + Openhour.query.get(id).date.strftime('%m/%d/%Y') + '. Thank You!', 'success')
+
+        sender = 'xana.wines@gmail.com'
+        subject = 'Open Hour: ' + openhour.date.strftime('%m/%d/%Y')
+        msgHtml = new_note.shopping
+        msgPlain = new_note.shopping
+
+        for volunteer in openhour.volunteers:
+            to = volunteer.email
+            SendMessage(sender, to, subject, msgHtml, msgPlain)
+
+        flash('Notes created for' + openhour.date.strftime('%m/%d/%Y') + '. Thank You!', 'success')
+
+        # flash('Notes created for' + Openhour.query.get(id).date.strftime('%m/%d/%Y') + '. Thank You!', 'success')
 
         return redirect(url_for('index'))
 
