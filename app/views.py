@@ -415,10 +415,20 @@ def add_note(id):
         subject = 'Open Hour: ' + openhour.date.strftime('%m/%d/%Y')
         msgHtml = new_note.shopping
         msgPlain = new_note.shopping
+        recipients = []
 
         for volunteer in openhour.volunteers:
-            to = volunteer.email
-            SendMessage(sender, to, subject, msgHtml, msgPlain)
+            recipients.append(volunteer.email)
+
+        to = ','.join(recipients)
+
+        print(to)
+
+        SendMessage(sender, to, subject, msgHtml, msgPlain)
+
+        # for volunteer in openhour.volunteers:
+        #     to = volunteer.email
+        #     SendMessage(sender, to, subject, msgHtml, msgPlain)
 
         flash('Notes created for' + openhour.date.strftime('%m/%d/%Y') + '. Thank You!', 'success')
 
