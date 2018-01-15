@@ -328,7 +328,7 @@ def add_openhour():
     form = OpenhourForm(request.form)
 
     volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.all()]
-    form.volunteer.choices = volunteer_list
+    form.volunteers.choices = volunteer_list
 
     if request.method == 'POST' and form.validate():
         new_openhour = Openhour(
@@ -341,7 +341,13 @@ def add_openhour():
         )
 
         db.session.add(new_openhour)
-        new_openhour.volunteers.append(Volunteer.query.get(form.volunteer.data))
+        
+        for volunteer in form.volunteers.data:
+            new_openhour.volunteers.append(Volunteer.query.get(volunteer))
+
+
+        # new_openhour.volunteers.append(Volunteer.query.get(form.volunteers.data))
+
         db.session.commit()
 
         flash('Record for ' + new_openhour.date.strftime('%m/%d/%Y') + 'saved! Thank you for volunteering with us!', 'success')

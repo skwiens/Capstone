@@ -1,6 +1,6 @@
 from flask_wtf import Form
 # from flask_wtf import FlaskForm
-from wtforms import Form, StringField, TextAreaField, IntegerField, SelectField, validators
+from wtforms import Form, StringField, TextAreaField, IntegerField, SelectField, SelectMultipleField, validators
 # from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import InputRequired, Email, Length
 from wtforms.fields.html5 import DateField
@@ -28,7 +28,8 @@ class OpenhourForm(Form):
     # author = StringField('Name')
     # author = QuerySelectField(query_factory=volunteer_query, allow_blank=True)
     date = DateField('Date', format='%Y-%m-%d')
-    volunteer = SelectField('Volunteer', coerce=int)
+    # volunteer = SelectField('Volunteer', coerce=int)
+    volunteers = SelectMultipleField('Volunteer', coerce=int)
 
 
 class NoteForm(Form):
