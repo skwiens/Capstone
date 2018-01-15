@@ -8,8 +8,6 @@ venv
 
 config
 
-migrations
-
 Bethany_Food_Bank.egg-info
 
 
