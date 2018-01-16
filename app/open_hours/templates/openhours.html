@@ -5,6 +5,7 @@
   <hr>
   <table class="table table-striped">
     <tr>
+      <th></th>
       <th>Date</th>
       <!-- <th>Author</th> -->
       <th>Volunteers</th>
@@ -13,7 +14,8 @@
     </tr>
     {% for openhour in openhours %}
       <tr>
-        <td><a href="openhour/{{openhour.id}}">{{ openhour.date.strftime('%m/%d/%Y') }}</a></td>
+        <td><a href="{{openhour.id}}/edit">Edit</a></td>
+        <td><a href="{{openhour.id}}">{{ openhour.date.strftime('%m/%d/%Y') }}</a></td>
         <td>
           {% for volunteer in openhour.volunteers %}
             <span>{{volunteer.name}}, </span>

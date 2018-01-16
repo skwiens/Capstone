@@ -51,3 +51,27 @@ def new_openhour():
         return redirect(url_for('index'))
 
     return render_template('openhour_form.html', form=form)
+
+@openhours_blueprint.route('/<string:id>/edit', methods=['GET', 'POST'])
+def edit_openhour(id):
+    openhour = Openhour.query.get(id)
+    form = OpenhourForm(request.form, obj=openhour)
+
+    #Dynamically create a list of volunteers to select for the openhour
+    volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.filter(Volunteer.role != 'shopper').all()]
+    form.volunteers.choices = volunteer_list
+    form.volunteers.choices.insert(0, (-1, 'None'))
+
+    shopper_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.filter(Volunteer.role != 'open-hours').all()]
+    form.shoppers.choices = shopper_list
+    form.shoppers.choices.insert(0, (-1, 'None'))
+
+    if request.method == 'POST' and form.validate():
+        form.populate_obj(openhour)
+        db.session.commit()
+
+        flash('Openhour for %s updated!' % openhour.date.strftime('%m/%d/%Y'), 'success')
+
+        return redirect(url_for('index'))
+
+    return render_template('openhour_form.html', form=form)
