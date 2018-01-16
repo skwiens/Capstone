@@ -20,7 +20,9 @@ from app import forms
 
 # import the blueprints
 from app.volunteers.views import volunteers_blueprint
+from app.users.views import users_blueprint
 
 
 # register the blueprints
 app.register_blueprint(volunteers_blueprint, url_prefix='/volunteers')
+app.register_blueprint(users_blueprint, url_prefix='/users')

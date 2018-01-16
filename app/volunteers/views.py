@@ -1,3 +1,5 @@
+#app/volunteers/views.py
+
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from app.models import Volunteer
 from app.forms import VolunteerForm
@@ -15,7 +17,7 @@ def volunteers():
     else:
         msg = 'No Volunteers Found'
         return render_template('volunteers.html', msg=msg)
-    return render_template('volunteers.html')
+    # return render_template('volunteers.html')
 
 @volunteers_blueprint.route('/new', methods=['GET', 'POST'])
 # @admin_logged_in

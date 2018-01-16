@@ -175,8 +175,6 @@ def credentials_to_dict(credentials):
           'client_secret': credentials.client_secret,
           'scopes': credentials.scopes}
 
-
-
 # from OpenSSL import SSL
 # context = SSL.Context(SSL.SSLv23_METHOD)
 # context.use_privatekey_file('localhost.key')
@@ -186,73 +184,73 @@ def credentials_to_dict(credentials):
 def index():
     return render_template('index.html')
 
-@app.route('/edit_user', methods=['GET', 'POST'])
-# @admin_logged_in
-def edit_user():
+# @app.route('/edit_user', methods=['GET', 'POST'])
+# # @admin_logged_in
+# def edit_user():
+#
+#     user = User.query.get(1)
+#     form = UserForm(request.form, obj=user)
+#
+#     if request.method == 'POST' and form.validate():
+#         form.populate_obj(user)
+#
+#         db.session.commit()
+#
+#         flash('User login updated', 'success')
+#
+#         return redirect(url_for('index'))
+#     else:
+#         return render_template('user.html', form=form)
 
-    user = User.query.get(1)
-    form = UserForm(request.form, obj=user)
 
-    if request.method == 'POST' and form.validate():
-        form.populate_obj(user)
+# @app.route('/add_user', methods=['GET', 'POST'])
+# # @admin_logged_in
+# def new_user():
+#
+#     form = UserForm(request.form)
+#
+#     if request.method == 'POST' and form.validate():
+#         new_user = User(
+#             username = form.username.data,
+#             password = form.password.data
+#         )
+#
+#         db.session.add(new_user)
+#         db.session.commit()
+#
+#         db.session.commit()
+#
+#         flash('User login updated', 'success')
+#
+#         return redirect(url_for('index'))
+#     else:
+#         return render_template('user.html', form=form)
 
-        db.session.commit()
-
-        flash('User login updated', 'success')
-
-        return redirect(url_for('index'))
-    else:
-        return render_template('user.html', form=form)
-
-
-@app.route('/add_user', methods=['GET', 'POST'])
-# @admin_logged_in
-def new_user():
-
-    form = UserForm(request.form)
-
-    if request.method == 'POST' and form.validate():
-        new_user = User(
-            username = form.username.data,
-            password = form.password.data
-        )
-
-        db.session.add(new_user)
-        db.session.commit()
-
-        db.session.commit()
-
-        flash('User login updated', 'success')
-
-        return redirect(url_for('index'))
-    else:
-        return render_template('user.html', form=form)
-
-@app.route('/user_login', methods=['GET', 'POST'])
-def user_login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password_candidate = request.form['password']
-
-        user = User.query.filter_by(username=username).first()
-
-        if user:
-            if password_candidate == user.password:
-                session['user'] = 'volunteer'
-                session['logged_in_user'] = True
-                session['username'] = username
-                # session['user'] = True
-
-                flash('Your are now logged in as a volunteer', 'success')
-                return redirect(url_for('index'))
-            else:
-                error = 'Invalid login'
-                return render_template('user_login.html', error=error)
-        else:
-            return render_template('user_login.html')
-            error='Username not found'
-            return render_template('user_login.html', error=error)
-    return render_template('user_login.html')
+# @app.route('/user_login', methods=['GET', 'POST'])
+# def user_login():
+#     if request.method == 'POST':
+#         username = request.form['username']
+#         password_candidate = request.form['password']
+#
+#         user = User.query.filter_by(username=username).first()
+#
+#         if user:
+#             if password_candidate == user.password:
+#                 session['user'] = 'volunteer'
+#                 session['logged_in_user'] = True
+#                 session['username'] = username
+#                 # session['user'] = True
+#
+#                 flash('Your are now logged in as a volunteer', 'success')
+#                 return redirect(url_for('index'))
+#             else:
+#                 error = 'Invalid login'
+#                 return render_template('user_login.html', error=error)
+#         else:
+#             return render_template('user_login.html')
+#             error='Username not found'
+#             return render_template('user_login.html', error=error)
+#     return render_template('user_login.html')
 
 @app.route('/logout')
 def logout():
