@@ -267,50 +267,50 @@ def openhour(id):
     return render_template('record.html', openhour=openhour)
 
 
-@app.route('/add_openhour', methods=['GET', 'POST'])
-# @user_logged_in
-def add_openhour():
-    form = OpenhourForm(request.form)
+# @app.route('/add_openhour', methods=['GET', 'POST'])
+# # @user_logged_in
+# def add_openhour():
+#     form = OpenhourForm(request.form)
+#
+#     volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.all()]
+#     form.volunteers.choices = volunteer_list
+#
+#     if request.method == 'POST' and form.validate():
+#         new_openhour = Openhour(
+#             # author = form.author.data,
+#             date = form.date.data,
+#             # volunteer = Volunteer.query.get(form.volunteer.data)
+#             # customers = form.customers.data,
+#             # notes = form.notes.data,
+#             # shopping = form.shopping.data
+#         )
+#
+#         db.session.add(new_openhour)
+#
+#         for volunteer in form.volunteers.data:
+#             new_openhour.volunteers.append(Volunteer.query.get(volunteer))
+#
+#         # new_openhour.volunteers.append(Volunteer.query.get(form.volunteers.data))
+#
+#         db.session.commit()
+#
+#         flash('Record for ' + new_openhour.date.strftime('%m/%d/%Y') + 'saved! Thank you for volunteering with us!', 'success')
+#
+#         return redirect(url_for('index'))
+#
+#     return render_template('add_openhour.html', form=form)
 
-    volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.all()]
-    form.volunteers.choices = volunteer_list
 
-    if request.method == 'POST' and form.validate():
-        new_openhour = Openhour(
-            # author = form.author.data,
-            date = form.date.data,
-            # volunteer = Volunteer.query.get(form.volunteer.data)
-            # customers = form.customers.data,
-            # notes = form.notes.data,
-            # shopping = form.shopping.data
-        )
-
-        db.session.add(new_openhour)
-
-        for volunteer in form.volunteers.data:
-            new_openhour.volunteers.append(Volunteer.query.get(volunteer))
-
-        # new_openhour.volunteers.append(Volunteer.query.get(form.volunteers.data))
-
-        db.session.commit()
-
-        flash('Record for ' + new_openhour.date.strftime('%m/%d/%Y') + 'saved! Thank you for volunteering with us!', 'success')
-
-        return redirect(url_for('index'))
-
-    return render_template('add_openhour.html', form=form)
-
-
-@app.route('/openhours')
-# @admin_logged_in
-def openhours():
-    openhours = Openhour.query.all()
-
-    if openhours:
-        return render_template('openhours.html', openhours=openhours)
-    else:
-        msg = 'No Open Hours Found'
-        return render_template('openhours.html', msg=msg)
+# @app.route('/openhours')
+# # @admin_logged_in
+# def openhours():
+#     openhours = Openhour.query.all()
+#
+#     if openhours:
+#         return render_template('openhours.html', openhours=openhours)
+#     else:
+#         msg = 'No Open Hours Found'
+#         return render_template('openhours.html', msg=msg)
 
 @app.route('/add_email', methods=['GET', 'POST'])
 # @admin_logged_in

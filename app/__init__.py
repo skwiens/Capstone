@@ -1,3 +1,6 @@
+#app/__init__.py
+
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from .config import AppConfig
@@ -21,8 +24,10 @@ from app import forms
 # import the blueprints
 from app.volunteers.views import volunteers_blueprint
 from app.users.views import users_blueprint
+from app.open_hours.views import openhours_blueprint
 
 
 # register the blueprints
 app.register_blueprint(volunteers_blueprint, url_prefix='/volunteers')
 app.register_blueprint(users_blueprint, url_prefix='/users')
+app.register_blueprint(openhours_blueprint, url_prefix='/openhours')
