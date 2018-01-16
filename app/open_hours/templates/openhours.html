@@ -8,6 +8,7 @@
       <th>Date</th>
       <!-- <th>Author</th> -->
       <th>Volunteers</th>
+      <th>Shoppers</th>
       <th>Notes</th>
     </tr>
     {% for openhour in openhours %}
@@ -15,7 +16,12 @@
         <td><a href="openhour/{{openhour.id}}">{{ openhour.date.strftime('%m/%d/%Y') }}</a></td>
         <td>
           {% for volunteer in openhour.volunteers %}
-            <span>{{volunteer.name}}</span>
+            <span>{{volunteer.name}}, </span>
+          {% endfor %}
+        </td>
+        <td>
+          {% for shopper in openhour.shoppers %}
+            <span>{{shopper.name}}, </span>
           {% endfor %}
         </td>
         {% if openhour.notes %}

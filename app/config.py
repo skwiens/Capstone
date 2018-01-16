@@ -14,6 +14,7 @@ class AppConfig:
     APP_NAME = "Bethany Food Bank"
     SECRET_KEY = 'clavesecreto'
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     # CLIENT_SECRETS_FILE = os.environ['CLIENT_SECRETS_FILE']
 
 # class DevConfig(Config):

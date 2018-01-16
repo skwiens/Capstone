@@ -22,17 +22,27 @@ def new_openhour():
     form = OpenhourForm(request.form)
 
     #Dynamically create a list of volunteers to select for the openhour
-    volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.all()]
+    volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.filter(Volunteer.role != 'shopper').all()]
     form.volunteers.choices = volunteer_list
+    form.volunteers.choices.insert(0, (-1, 'None'))
+
+    shopper_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.filter(Volunteer.role != 'open-hours').all()]
+    form.shoppers.choices = shopper_list
+    form.shoppers.choices.insert(0, (-1, 'None'))
 
     if request.method == 'POST' and form.validate():
         new_openhour = Openhour(date=form.date.data)
 
         db.session.add(new_openhour)
 
-        # Add in any volunteers
+        # Add in any volunteers and shoppers
         for volunteer in form.volunteers.data:
-            new_openhour.volunteers.append(Volunteer.query.get(volunteer))
+            if volunteer != -1:
+                new_openhour.volunteers.append(Volunteer.query.get(volunteer))
+
+        for shopper in form.shoppers.data:
+            if volunteer != -1:
+                new_openhour.shoppers.append(Volunteer.query.get(shopper))
 
         db.session.commit()
 

@@ -19,12 +19,18 @@ openhour_volunteers = db.Table('openhour_volunteers',
     db.Column('volunteer_id', db.Integer, db.ForeignKey('volunteer.id'))
 )
 
+openhour_shoppers = db.Table('openhour_shoppers',
+    db.Column('openhour_id', db.Integer, db.ForeignKey('openhour.id')),
+    db.Column('volunteer_id', db.Integer, db.ForeignKey('volunteer.id'))
+)
+
 class Volunteer(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(100))
     role = db.Column(db.String(50))
     email = db.Column(db.String(255), unique=True, nullable=False)
     openhours = db.relationship('Openhour', secondary=openhour_volunteers, backref='ohvolunteers', lazy='subquery')
+    openhour_shoppers = db.relationship('Openhour', secondary=openhour_shoppers, backref='ohshoppers', lazy='subquery')
     notes = db.relationship('Note', backref='openhour', lazy=True)
 
 
@@ -42,6 +48,7 @@ class Openhour(db.Model):
     # author = db.Column(db.String(255))
     date = db.Column(db.DateTime())
     volunteers = db.relationship('Volunteer', secondary=openhour_volunteers, backref='openhourvols', lazy='dynamic')
+    shoppers = db.relationship('Volunteer', secondary=openhour_shoppers, backref='openhourshoppers', lazy='dynamic' )
     notes = db.relationship('Note', backref='openhournotes', lazy=True)
     # volunteers = db.Column(db.String(255))
     # customers = db.Column(db.Integer())

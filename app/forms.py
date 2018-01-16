@@ -29,8 +29,8 @@ class OpenhourForm(Form):
     # author = QuerySelectField(query_factory=volunteer_query, allow_blank=True)
     date = DateField('Date', format='%Y-%m-%d')
     # volunteer = SelectField('Volunteer', coerce=int)
-    volunteers = SelectMultipleField('Volunteer', coerce=int)
-
+    volunteers = SelectMultipleField('Volunteers', coerce=int)
+    shoppers = SelectMultipleField('Shoppers', coerce=int)
 
 class NoteForm(Form):
     author = SelectField('Name', coerce=int)
