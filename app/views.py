@@ -36,15 +36,13 @@ import sendgrid
 CLIENT_SECRETS_FILE = 'client_secret.json'
 CLIENT_SECRET_FILE = 'client_secret.json'
 # CLIENT_SECRETS_FILE = os.environ['CLIENT_SECRETS_FILE']
-SCOPES = ['https://www.googleapis.com/auth/gmail.compose']
+SCOPES = ['https://www.googleapis.com/auth/gmail.compose', 'https://www.googleapis.com/auth/calendar']
 API_SERVICE_NAME = 'gmail'
 API_VERSION = 'v1'
 APPLICATION_NAME = 'Bethany Food Bank'
 
 import os
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-
-
 
 def get_credentials():
     home_dir = os.path.expanduser('~')
@@ -58,7 +56,7 @@ def get_credentials():
         flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store)
-        print('Storing credentials to ' + credential_path)
+        print('Storing gmail credentials to ' + credential_path)
     return credentials
 
 def user_logged_in(f):
@@ -422,8 +420,6 @@ def add_note(id):
 
         to = ','.join(recipients)
 
-        print(to)
-
         SendMessage(sender, to, subject, msgHtml, msgPlain)
 
         # for volunteer in openhour.volunteers:
@@ -553,9 +549,6 @@ def createMessageWithAttachment(
 @admin_logged_in
 def send_email():
     email = Email.query.get(1)
-    print(email)
-    print(email.subject)
-    print(email.message)
     to = email.recipients
     sender = "xana.wines.ada@gmail.com"
     subject = email.subject
@@ -569,7 +562,84 @@ def send_email():
     SendMessage(sender, to, subject, msgHtml, msgPlain)
     # # Send message with attachment:
     # # SendMessage(sender, to, subject, msgHtml, msgPlain, '/path/to/file.pdf')
-    flash('Hahahahahaha', 'success')
+    flash('Email successfully sent!', 'success')
+    return redirect(url_for('index'))
+
+
+    # home_dir = os.path.expanduser('~')
+    # credential_dir = os.path.join(home_dir, '.credentials')
+    # if not os.path.exists(credential_dir):
+    #     os.makedirs(credential_dir)
+    # credential_path = os.path.join(credential_dir, 'gmail-python-email-send.json')
+    # store = oauth2client.file.Storage(credential_path)
+    # credentials = store.get()
+    # if not credentials or credentials.invalid:
+    #     flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+    #     flow.user_agent = APPLICATION_NAME
+    #     credentials = tools.run_flow(flow, store)
+    #     print('Storing gmail credentials to ' + credential_path)
+    # return credentials
+
+
+
+def get_cal_credentials():
+    """Gets valid user credentials from storage.
+
+    If nothing has been stored, or if the stored credentials are invalid,
+    the OAuth2 flow is completed to obtain the new credentials.
+
+    Returns:
+        Credentials, the obtained credential.
+    """
+    credentials = google.oauth2.credentials.Credentials(
+      **session['credentials'])
+    home_dir = os.path.expanduser('~')
+    credential_dir = os.path.join(home_dir, '.credentials')
+    if not os.path.exists(credential_dir):
+        os.makedirs(credential_dir)
+    credential_path = os.path.join(credential_dir,
+                                   'calendar-python.json')
+
+    store = oauth2client.file.Storage(credential_path)
+    # credentials = store.get()
+    if not credentials or credentials.invalid:
+        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow.user_agent = APPLICATION_NAME
+        credentials = tools.run_flow(flow, store)
+        print('Storing calendar credentials to ' + credential_path)
+    return credentials
+
+@app.route('/make_appt')
+@admin_logged_in
+def make_appt():
+
+    credentials = google.oauth2.credentials.Credentials(
+      **session['credentials'])
+
+    # service = googleapiclient.discovery.build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
+    service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
+
+
+    # credentials = get_cal_credentials()
+    # credentials = get_credentials()
+    # http = credentials.authorize(httplib2.Http())
+    # service = discovery.build('calendar', 'v3', http=http)
+
+    event = {
+        'summary': 'OH: Nathan K.',
+        'start': {
+            'dateTime': '2018-01-22T17:35:09-08:00',
+            'timeZone': 'America/Los_Angeles'
+        },
+        'end': {
+            'dateTime': '2018-01-22T17:35:09-08:00',
+            'timeZone': 'America/Los_Angeles'
+        }
+    }
+
+    event = service.events().insert(calendarId='primary', body=event).execute()
+    print ('Event created: %s' % (event.get('htmlLink')))
+    flash('Event created: %s' % (event.get('htmlLink')), 'success')
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
