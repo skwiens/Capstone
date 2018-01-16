@@ -1,3 +1,4 @@
+# app/views.py
 from flask import Flask, render_template, request, url_for, redirect, session, flash
 from . import app
 from .forms import VolunteerForm, OpenhourForm, UserForm, EmailForm, NoteForm
@@ -28,7 +29,7 @@ import os
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
-import sendgrid
+# import sendgrid
 # from sendgrid.helpers.mail import *
 
 
@@ -184,58 +185,6 @@ def credentials_to_dict(credentials):
 @app.route('/')
 def index():
     return render_template('index.html')
-
-@app.route('/add_volunteer', methods=['GET', 'POST'])
-# @admin_logged_in
-def add_volunteer():
-    form = VolunteerForm(request.form)
-    if request.method == 'POST' and form.validate():
-
-        new_volunteer = Volunteer(
-            name = form.name.data,
-            email = form.email.data,
-            role = form.role.data
-        )
-
-        db.session.add(new_volunteer)
-        db.session.commit()
-
-        flash('Volunteer ' + new_volunteer.name + ' added!', 'success')
-
-        return redirect(url_for('index'))
-    return render_template('volunteer_form.html', form=form)
-
-
-@app.route('/volunteer/edit/<string:id>', methods=['GET', 'POST'])
-# @admin_logged_in
-def edit_volunteer(id):
-
-    volunteer = Volunteer.query.get(id)
-    form = VolunteerForm(request.form, obj=volunteer)
-
-    if request.method == 'POST' and form.validate():
-        form.populate_obj(volunteer)
-
-        db.session.commit()
-
-        flash('Information from ' + volunteer.name + ' Updated', 'success')
-
-        return redirect(url_for('index'))
-    else:
-        return render_template('volunteer_form.html', form=form)
-
-
-@app.route('/volunteers')
-# @admin_logged_in
-def volunteers():
-    volunteers = Volunteer.query.all()
-
-    if volunteers:
-        return render_template('volunteers.html', volunteers=volunteers)
-    else:
-        msg = 'No Open Hours Found'
-        return render_template('volunteers.html', msg=msg)
-
 
 @app.route('/edit_user', methods=['GET', 'POST'])
 # @admin_logged_in

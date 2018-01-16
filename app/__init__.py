@@ -17,3 +17,10 @@ login_manager.session_protection = "strong"
 from app import views
 from app import models
 from app import forms
+
+# import the blueprints
+from app.volunteers.views import volunteers_blueprint
+
+
+# register the blueprints
+app.register_blueprint(volunteers_blueprint, url_prefix='/volunteers')
