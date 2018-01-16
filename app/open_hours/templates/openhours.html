@@ -27,9 +27,9 @@
           {% endfor %}
         </td>
         {% if openhour.notes %}
-          <td><a href="openhour/{{openhour.id}}/note">View Notes</a></td>
+          <td><a href="{{openhour.id}}/notes">View Notes</a></td>
         {% else %}
-          <td><a href="openhour/{{openhour.id}}/add_note">Add Notes</a></td>
+          <td><a href="{{openhour.id}}/notes/new">Add Notes</a></td>
         {% endif %}
       </tr>
     {% endfor %}

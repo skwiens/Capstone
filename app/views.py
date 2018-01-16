@@ -184,74 +184,6 @@ def credentials_to_dict(credentials):
 def index():
     return render_template('index.html')
 
-# @app.route('/edit_user', methods=['GET', 'POST'])
-# # @admin_logged_in
-# def edit_user():
-#
-#     user = User.query.get(1)
-#     form = UserForm(request.form, obj=user)
-#
-#     if request.method == 'POST' and form.validate():
-#         form.populate_obj(user)
-#
-#         db.session.commit()
-#
-#         flash('User login updated', 'success')
-#
-#         return redirect(url_for('index'))
-#     else:
-#         return render_template('user.html', form=form)
-
-
-# @app.route('/add_user', methods=['GET', 'POST'])
-# # @admin_logged_in
-# def new_user():
-#
-#     form = UserForm(request.form)
-#
-#     if request.method == 'POST' and form.validate():
-#         new_user = User(
-#             username = form.username.data,
-#             password = form.password.data
-#         )
-#
-#         db.session.add(new_user)
-#         db.session.commit()
-#
-#         db.session.commit()
-#
-#         flash('User login updated', 'success')
-#
-#         return redirect(url_for('index'))
-#     else:
-#         return render_template('user.html', form=form)
-
-# @app.route('/user_login', methods=['GET', 'POST'])
-# def user_login():
-#     if request.method == 'POST':
-#         username = request.form['username']
-#         password_candidate = request.form['password']
-#
-#         user = User.query.filter_by(username=username).first()
-#
-#         if user:
-#             if password_candidate == user.password:
-#                 session['user'] = 'volunteer'
-#                 session['logged_in_user'] = True
-#                 session['username'] = username
-#                 # session['user'] = True
-#
-#                 flash('Your are now logged in as a volunteer', 'success')
-#                 return redirect(url_for('index'))
-#             else:
-#                 error = 'Invalid login'
-#                 return render_template('user_login.html', error=error)
-#         else:
-#             return render_template('user_login.html')
-#             error='Username not found'
-#             return render_template('user_login.html', error=error)
-#     return render_template('user_login.html')
-
 @app.route('/logout')
 def logout():
     session.clear()
@@ -265,52 +197,6 @@ def openhour(id):
     openhour = Openhour.query.get(id)
 
     return render_template('record.html', openhour=openhour)
-
-
-# @app.route('/add_openhour', methods=['GET', 'POST'])
-# # @user_logged_in
-# def add_openhour():
-#     form = OpenhourForm(request.form)
-#
-#     volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.all()]
-#     form.volunteers.choices = volunteer_list
-#
-#     if request.method == 'POST' and form.validate():
-#         new_openhour = Openhour(
-#             # author = form.author.data,
-#             date = form.date.data,
-#             # volunteer = Volunteer.query.get(form.volunteer.data)
-#             # customers = form.customers.data,
-#             # notes = form.notes.data,
-#             # shopping = form.shopping.data
-#         )
-#
-#         db.session.add(new_openhour)
-#
-#         for volunteer in form.volunteers.data:
-#             new_openhour.volunteers.append(Volunteer.query.get(volunteer))
-#
-#         # new_openhour.volunteers.append(Volunteer.query.get(form.volunteers.data))
-#
-#         db.session.commit()
-#
-#         flash('Record for ' + new_openhour.date.strftime('%m/%d/%Y') + 'saved! Thank you for volunteering with us!', 'success')
-#
-#         return redirect(url_for('index'))
-#
-#     return render_template('add_openhour.html', form=form)
-
-
-# @app.route('/openhours')
-# # @admin_logged_in
-# def openhours():
-#     openhours = Openhour.query.all()
-#
-#     if openhours:
-#         return render_template('openhours.html', openhours=openhours)
-#     else:
-#         msg = 'No Open Hours Found'
-#         return render_template('openhours.html', msg=msg)
 
 @app.route('/add_email', methods=['GET', 'POST'])
 # @admin_logged_in
@@ -332,54 +218,6 @@ def add_email():
         return redirect(url_for('index'))
 
     return render_template('new_email.html', form=form)
-
-@app.route('/openhour/<string:id>/add_note', methods=['GET', 'POST'])
-def add_note(id):
-    form = NoteForm(request.form)
-
-    volunteer_list = [(volunteer.id, volunteer.name) for volunteer in Volunteer.query.all()]
-
-    openhour = Openhour.query.get(id)
-
-    form.author.choices = volunteer_list
-
-    if request.method == 'POST' and form.validate():
-        new_note = Note(
-            openhour_id = id,
-            author = form.author.data,
-            customers = form.customers.data,
-            body = form.body.data,
-            shopping = form.shopping.data
-        )
-
-        db.session.add(new_note)
-        db.session.commit()
-
-
-        sender = 'xana.wines@gmail.com'
-        subject = 'Open Hour: ' + openhour.date.strftime('%m/%d/%Y')
-        msgHtml = new_note.shopping
-        msgPlain = new_note.shopping
-        recipients = []
-
-        for volunteer in openhour.volunteers:
-            recipients.append(volunteer.email)
-
-        to = ','.join(recipients)
-
-        SendMessage(sender, to, subject, msgHtml, msgPlain)
-
-        # for volunteer in openhour.volunteers:
-        #     to = volunteer.email
-        #     SendMessage(sender, to, subject, msgHtml, msgPlain)
-
-        flash('Notes created for' + openhour.date.strftime('%m/%d/%Y') + '. Thank You!', 'success')
-
-        # flash('Notes created for' + Openhour.query.get(id).date.strftime('%m/%d/%Y') + '. Thank You!', 'success')
-
-        return redirect(url_for('index'))
-
-    return render_template('add_note.html', form=form)
 
 @app.route('/openhour/<string:id>/note')
 def note(id):
