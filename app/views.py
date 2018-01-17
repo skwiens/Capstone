@@ -35,7 +35,7 @@ import googleapiclient.discovery
 
 #### HELP!  NEED THIS TO BE NOT A FILE! #####
 CLIENT_SECRETS_FILE = 'client_secret.json'
-CLIENT_SECRET_FILE = 'client_secret.json'
+# CLIENT_SECRETS_FILE = 'client_secret.json'
 # CLIENT_SECRETS_FILE = os.environ['CLIENT_SECRETS_FILE']
 SCOPES = ['https://www.googleapis.com/auth/gmail.compose', 'https://www.googleapis.com/auth/calendar']
 API_SERVICE_NAME = 'gmail'
@@ -54,7 +54,7 @@ def get_credentials():
     store = oauth2client.file.Storage(credential_path)
     credentials = store.get()
     if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow = client.flow_from_clientsecrets(CLIENT_SECRETS_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store)
         print('Storing gmail credentials to ' + credential_path)
@@ -96,7 +96,7 @@ def admin_login():
         user_profile = service.users().getProfile(userId='me').execute()
         emailAddress = user_profile['emailAddress']
         if user_profile['emailAddress'] == 'xana.wines.ada@gmail.com':
-            session['user'] = 'admin'
+            # session['user']='admin'
             flash('You are now logged in as an administrator', 'success')
             # redirect(url_for('index'))
         else:
@@ -359,7 +359,7 @@ def send_email():
     # store = oauth2client.file.Storage(credential_path)
     # credentials = store.get()
     # if not credentials or credentials.invalid:
-    #     flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+    #     flow = client.flow_from_clientsecrets(CLIENT_SECRETS_FILE, SCOPES)
     #     flow.user_agent = APPLICATION_NAME
     #     credentials = tools.run_flow(flow, store)
     #     print('Storing gmail credentials to ' + credential_path)
@@ -388,7 +388,7 @@ def get_cal_credentials():
     store = oauth2client.file.Storage(credential_path)
     # credentials = store.get()
     if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow = client.flow_from_clientsecrets(CLIENT_SECRETS_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store)
         print('Storing calendar credentials to ' + credential_path)
