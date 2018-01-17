@@ -35,11 +35,11 @@ import googleapiclient.discovery
 
 #### HELP!  NEED THIS TO BE NOT A FILE! OR GET THIS FILE INTO HEROKU #####
 CLIENT_SECRETS_FILE = 'client_secret.json'
-CLIENT_SECRET_FILE = 'client_secret.json'
+# CLIENT_SECRETS_FILE = 'client_secret.json'
 # CLIENT_SECRETS_FILE = os.environ['CLIENT_SECRETS_FILE']
 SCOPES = ['https://www.googleapis.com/auth/gmail.compose', 'https://www.googleapis.com/auth/calendar']
-API_SERVICE_NAME = 'gmail'
-API_VERSION = 'v1'
+# API_SERVICE_NAME = 'gmail'
+# API_VERSION = 'v1'
 APPLICATION_NAME = 'Bethany Food Bank'
 
 import os
@@ -54,7 +54,7 @@ def get_credentials():
     store = oauth2client.file.Storage(credential_path)
     credentials = store.get()
     if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow = client.flow_from_clientsecrets(CLIENT_SECRETS_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store)
         print('Storing gmail credentials to ' + credential_path)
@@ -90,7 +90,7 @@ def admin_login():
       **session['credentials'])
 
     service = googleapiclient.discovery.build(
-      API_SERVICE_NAME, API_VERSION, credentials=credentials)
+      'gmail', 'v1', credentials=credentials)
 
     if service:
         user_profile = service.users().getProfile(userId='me').execute()
@@ -359,7 +359,7 @@ def send_email():
     # store = oauth2client.file.Storage(credential_path)
     # credentials = store.get()
     # if not credentials or credentials.invalid:
-    #     flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+    #     flow = client.flow_from_clientsecrets(CLIENT_SECRETS_FILE, SCOPES)
     #     flow.user_agent = APPLICATION_NAME
     #     credentials = tools.run_flow(flow, store)
     #     print('Storing gmail credentials to ' + credential_path)
@@ -386,7 +386,7 @@ def get_cal_credentials():
     store = oauth2client.file.Storage(credential_path)
     credentials = store.get()
     if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow = client.flow_from_clientsecrets(CLIENT_SECRETS_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store)
         print('Storing calendar credentials to ' + credential_path)
@@ -399,7 +399,6 @@ def make_appt():
     credentials = google.oauth2.credentials.Credentials(
       **session['credentials'])
 
-    # service = googleapiclient.discovery.build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
     service = googleapiclient.discovery.build('calendar', 'v3', credentials=credentials)
 
 

@@ -34,7 +34,7 @@ import googleapiclient.discovery
 import google_auth_httplib2
 
 CLIENT_SECRETS_FILE = 'client_secret.json'
-CLIENT_SECRET_FILE = 'client_secret.json'
+# CLIENT_SECRET_FILE = 'client_secret.json'
 SCOPES = ['https://www.googleapis.com/auth/gmail.compose', 'https://www.googleapis.com/auth/calendar']
 APPLICATION_NAME = 'Bethany Food Bank'
 
@@ -59,7 +59,7 @@ def get_credentials():
     print('^^^^^^^^^^^^^^^^')
     if not credentials or credentials.invalid:
         print('ENTERING!!! CREATING CREDENTIALS!!!!')
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow = client.flow_from_clientsecrets(CLIENT_SECRETS_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store)
         print('Storing calendar credentials to ' + credential_path)
