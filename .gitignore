@@ -22,5 +22,6 @@ client_secret.json
 
 app/credentials
 
+gmail-python-email-send.json
 
 rundev.sh

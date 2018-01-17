@@ -83,6 +83,7 @@ def admin_logged_in(f):
 @app.route('/admin_login')
 def admin_login():
     if 'credentials' not in session:
+        print('credentials not in session')
         return redirect('authorize')
 
     # Load credentials from the session.
@@ -96,7 +97,7 @@ def admin_login():
         user_profile = service.users().getProfile(userId='me').execute()
         emailAddress = user_profile['emailAddress']
         if user_profile['emailAddress'] == 'xana.wines.ada@gmail.com':
-            # session['user']='admin'
+            session['user']='admin'
             flash('You are now logged in as an administrator', 'success')
             # redirect(url_for('index'))
         else:
