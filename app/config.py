@@ -4,7 +4,7 @@ import os
 class Auth:
     CLIENT_ID = os.environ['CLIENT_ID']
     CLIENT_SECRET = os.environ['CLIENT_SECRET']
-    REDIRECT_URI = 'http://localhost:5000/oauth2callback'
+    REDIRECT_URI = 'https://bethany-food-bank-heroku.herokuapp.com//oauth2callback'
     AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
     TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'
     USER_INFO = 'https://www.googleapis.com/userinfo/v2/me'
