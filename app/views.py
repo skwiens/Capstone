@@ -33,7 +33,7 @@ import googleapiclient.discovery
 # from sendgrid.helpers.mail import *
 
 
-#### HELP!  NEED THIS TO BE NOT A FILE! #####
+#### HELP!  NEED THIS TO BE NOT A FILE! OR GET THIS FILE INTO HEROKU #####
 CLIENT_SECRETS_FILE = 'client_secret.json'
 CLIENT_SECRET_FILE = 'client_secret.json'
 # CLIENT_SECRETS_FILE = os.environ['CLIENT_SECRETS_FILE']
@@ -158,13 +158,13 @@ def revoke():
   else:
     return('An error occurred.')
 
-# @app.route('/clear')
-# def clear_credentials():
-#   if 'credentials' in session:
-#     del session['credentials']
-#   if 'user' in session:
-#     del session['user']
-#   return redirect(url_for('index'))
+@app.route('/clear')
+def clear_credentials():
+  if 'credentials' in session:
+    del session['credentials']
+  if 'user' in session:
+    del session['user']
+  return redirect(url_for('index'))
 
 
 def credentials_to_dict(credentials):
@@ -365,8 +365,6 @@ def send_email():
     #     print('Storing gmail credentials to ' + credential_path)
     # return credentials
 
-
-
 def get_cal_credentials():
     """Gets valid user credentials from storage.
 
@@ -386,7 +384,7 @@ def get_cal_credentials():
                                    'calendar-python.json')
 
     store = oauth2client.file.Storage(credential_path)
-    # credentials = store.get()
+    credentials = store.get()
     if not credentials or credentials.invalid:
         flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
