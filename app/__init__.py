@@ -32,3 +32,6 @@ from app.open_hours.views import openhours_blueprint
 app.register_blueprint(volunteers_blueprint, url_prefix='/volunteers')
 app.register_blueprint(users_blueprint, url_prefix='/users')
 app.register_blueprint(openhours_blueprint, url_prefix='/openhours')
+
+if __name__ == '__main__':
+    app.run()

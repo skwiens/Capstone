@@ -1,7 +1,8 @@
 Created postgresql-horizontal-54329 as HEROKU_POSTGRESQL_CHARCOAL_URL
 Use heroku addons:docs heroku-postgresql to view documentation
 
-
+DATABASE_URL=
+postgres://jmdztdcsifydmz:1ae444b0e1c0c760f9a71a59915d55701ec8a1eb2290999c2b158bf2f3f216d4@ec2-107-22-183-40.compute-1.amazonaws.com:5432/d6jjn1vnoq0et8
 
 
 
