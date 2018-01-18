@@ -100,17 +100,11 @@ def oauth2callback():
 
 @openhours_blueprint.route('/')
 def openhours():
-    app.logger.info('!!!!!!!!!!!!!!!!!!!!!')
-    app.logger.info('in /openhours')
     openhours = Openhour.query.all()
 
-    app.logger.info('query complete')
-    app.logger.info(openhours)
     if openhours:
-        app.logger.info('openhours found')
         return render_template('openhours.html', openhours=openhours)
     else:
-        app.logger.info('no open hours found')
         msg = 'No Open Hours Found'
         return render_template('openhours.html', msg=msg)
 
